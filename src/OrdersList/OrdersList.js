@@ -61,6 +61,8 @@ function OrdersList({
   ordersCount,
   resetData,
   refreshList,
+  onExportCSV,
+  generateOrders,
 }) {
   const [
     filters,
@@ -102,9 +104,11 @@ function OrdersList({
         ordersCount={ordersCount}
         search={location.search}
         onToggle={onToggle}
+        onExportCSV={onExportCSV}
+        generateOrders={generateOrders}
       />
     ),
-    [location.search, ordersCount],
+    [location.search, ordersCount, onExportCSV, generateOrders],
   );
 
   return (
@@ -188,6 +192,8 @@ OrdersList.propTypes = {
   history: ReactRouterPropTypes.history.isRequired,
   location: ReactRouterPropTypes.location.isRequired,
   refreshList: PropTypes.func.isRequired,
+  onExportCSV: PropTypes.func.isRequired,
+  generateOrders: PropTypes.func.isRequired,
 };
 
 OrdersList.defaultProps = {

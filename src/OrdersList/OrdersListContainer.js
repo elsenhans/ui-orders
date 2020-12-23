@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import ReactRouterPropTypes from 'react-router-prop-types';
 import queryString from 'query-string';
+import { omit, random } from 'lodash';
 
-import { getFullName } from '@folio/stripes/util';
+import { getFullName, exportCsv } from '@folio/stripes/util';
 import { stripesConnect } from '@folio/stripes/core';
 import {
   makeQueryBuilder,
@@ -120,6 +121,38 @@ const OrdersListContainer = ({ mutator, location }) => {
     refreshList,
   } = useList(false, loadOrders, loadOrdersCB, RESULT_COUNT_INCREMENT);
 
+  const onExportCSV = useCallback(() => {
+    return mutator.ordersListRecords.GET({
+      params: {
+        query: buildQuery(queryString.parse(location.search)),
+        limit: 10000,
+        perRequest: 10000,
+      },
+    })
+      .then(ordersResp => exportCsv(ordersResp.purchaseOrders, {}));
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [location.search]);
+
+  const generateOrders = useCallback(async () => {
+    const clonedOrder = { ...orders[0] };
+    const orderToPOST = omit(clonedOrder, ['id', 'acquisitionsUnit', 'vendorCode']);
+
+    const generetedOrders = new Array(1000).fill().map(() => {
+      return ({
+        ...orderToPOST,
+        poNumber: random(10000, 99999),
+        assignedTo: '994a1be5-170f-5b3c-b7c3-3008f907ef52',
+      });
+    });
+
+    await generetedOrders.map(order => mutator.ordersListRecords.POST(order));
+
+    refreshList();
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [refreshList, orders]);
+
   return (
     <OrdersList
       ordersCount={ordersCount}
@@ -128,6 +161,8 @@ const OrdersListContainer = ({ mutator, location }) => {
       orders={orders}
       refreshList={refreshList}
       resetData={resetData}
+      onExportCSV={onExportCSV}
+      generateOrders={generateOrders}
     />
   );
 };
