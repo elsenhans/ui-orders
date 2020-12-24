@@ -260,7 +260,7 @@ const OrdersListContainer = ({ mutator, location }) => {
         quantityPhysical: 1,
       }],
     };
-    const generetedPOLs = new Array(10).fill().map(() => {
+    const generetedPOLs = new Array(100).fill().map(() => {
       return ({
         ...testPOL,
         purchaseOrderId: orders[random(0, orders.length - 1)].id,
