@@ -8,6 +8,7 @@ import { omit, random } from 'lodash';
 import { getFullName, exportCsv } from '@folio/stripes/util';
 import { stripesConnect } from '@folio/stripes/core';
 import {
+  batchFetch,
   makeQueryBuilder,
   organizationsManifest,
   useList,
@@ -17,6 +18,7 @@ import { RESULT_COUNT_INCREMENT } from '../common/constants';
 import {
   ACQUISITIONS_UNITS,
   ORDERS,
+  ORDER_LINES,
   USERS,
 } from '../components/Utils/resources';
 import OrdersList from './OrdersList';
@@ -121,18 +123,102 @@ const OrdersListContainer = ({ mutator, location }) => {
     refreshList,
   } = useList(false, loadOrders, loadOrdersCB, RESULT_COUNT_INCREMENT);
 
-  const onExportCSV = useCallback(() => {
-    return mutator.ordersListRecords.GET({
-      params: {
-        query: buildQuery(queryString.parse(location.search)),
-        limit: 10000,
-        perRequest: 10000,
-      },
-    })
-      .then(ordersResp => exportCsv(ordersResp.purchaseOrders, {}));
+  const fetchReportOrdersData = useCallback(async () => {
+    const limit = 1000;
+    const data = [];
+    let offset = 0;
+    let hasData = true;
+
+    while (hasData) {
+      try {
+        mutator.ordersListRecords.reset();
+        // eslint-disable-next-line no-await-in-loop
+        const { purchaseOrders } = await mutator.ordersListRecords.GET({
+          params: {
+            query: buildQuery(queryString.parse(location.search)),
+            limit,
+            offset,
+          },
+        });
+
+        hasData = purchaseOrders.length;
+        offset += limit;
+        if (hasData) {
+          data.push(...purchaseOrders);
+        }
+      } catch (e) {
+        hasData = false;
+      }
+    }
+
+    return data;
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [location.search]);
+
+  const fetchReportLinesData = useCallback(async (purchaseOrders) => {
+    // const ordersIds = purchaseOrders.map(({ id }) => id);
+    // const buildLinesQuery = (itemsChunk) => {
+    //   const query = itemsChunk
+    //     .map(id => `purchaseOrderId==${id}`)
+    //     .join(' or ');
+
+    //   return query || '';
+    // };
+
+    // return batchFetch(mutator.orderLines, ordersIds, buildLinesQuery);
+
+    const limit = 1000;
+    const data = [];
+    let offset = 0;
+    let hasData = true;
+
+    while (hasData) {
+      try {
+        mutator.ordersListRecords.reset();
+        // eslint-disable-next-line no-await-in-loop
+        const { poLines } = await mutator.orderLines.GET({
+          params: {
+            limit,
+            offset,
+          },
+        });
+
+        hasData = poLines.length;
+        offset += limit;
+        if (hasData) {
+          data.push(...poLines);
+        }
+      } catch (e) {
+        hasData = false;
+      }
+    }
+
+    return data;
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
+
+  const onExportCSV = useCallback(async () => {
+    const orderRecords = await fetchReportOrdersData();
+    const linesRecords = await fetchReportLinesData(orderRecords);
+    const orderLinesMap = linesRecords.reduce((acc, line) => {
+      if (acc[line.purchaseOrderId]) {
+        acc[line.purchaseOrderId].push(line);
+      } else acc[line.purchaseOrderId] = [line];
+
+      return acc;
+    }, {});
+
+    const exportData = orderRecords.map(orderRecord => ({
+      ...orderRecord,
+      compositePoLines: orderLinesMap[orderRecord.id],
+    }));
+
+    return exportCsv(exportData, {});
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [location.search, fetchReportOrdersData, fetchReportLinesData]);
 
   const generateOrders = useCallback(async () => {
     const clonedOrder = { ...orders[0] };
@@ -142,11 +228,46 @@ const OrdersListContainer = ({ mutator, location }) => {
       return ({
         ...orderToPOST,
         poNumber: random(10000, 99999),
-        assignedTo: '994a1be5-170f-5b3c-b7c3-3008f907ef52',
+        assignedTo: null,
       });
     });
 
     await generetedOrders.map(order => mutator.ordersListRecords.POST(order));
+
+    refreshList();
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [refreshList, orders]);
+
+  const generatePOLs = useCallback(async () => {
+    const testPOL = {
+      source: 'User',
+      titleOrPackage: 'Test',
+      acquisitionMethod: 'Purchase',
+      orderFormat: 'Other',
+      cost: {
+        listUnitPrice: 0,
+        poLineEstimatedPrice: 0,
+        currency: 'USD',
+        additionalCost: 0,
+        discount: 0,
+        quantityPhysical: 1,
+      },
+      locations: [{
+        locationId: '758258bc-ecc1-41b8-abca-f7b610822ffd',
+        quantity: 1,
+        quantityElectronic: 0,
+        quantityPhysical: 1,
+      }],
+    };
+    const generetedPOLs = new Array(10).fill().map(() => {
+      return ({
+        ...testPOL,
+        purchaseOrderId: orders[random(0, orders.length - 1)].id,
+      });
+    });
+
+    await generetedPOLs.map(line => mutator.orderLines.POST(line));
 
     refreshList();
   },
@@ -163,6 +284,7 @@ const OrdersListContainer = ({ mutator, location }) => {
       resetData={resetData}
       onExportCSV={onExportCSV}
       generateOrders={generateOrders}
+      generatePOLs={generatePOLs}
     />
   );
 };
@@ -184,6 +306,11 @@ OrdersListContainer.manifest = Object.freeze({
   },
   orderUsers: {
     ...USERS,
+    accumulate: true,
+    fetch: false,
+  },
+  orderLines: {
+    ...ORDER_LINES,
     accumulate: true,
     fetch: false,
   },

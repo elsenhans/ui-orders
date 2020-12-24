@@ -9,7 +9,7 @@ import {
 } from '@folio/stripes/components';
 import { IfPermission } from '@folio/stripes/core';
 
-const OrdersListActionMenu = ({ search, ordersCount, onToggle, onExportCSV, generateOrders }) => {
+const OrdersListActionMenu = ({ search, ordersCount, onToggle, onExportCSV, generateOrders, generatePOLs }) => {
   const intl = useIntl();
 
   return (
@@ -59,6 +59,17 @@ const OrdersListActionMenu = ({ search, ordersCount, onToggle, onExportCSV, gene
       >
         Generate 1000 orders
       </Button>
+
+      <Button
+        buttonStyle="dropdownItem"
+        disabled={!ordersCount}
+        onClick={() => {
+          onToggle();
+          generatePOLs();
+        }}
+      >
+        Generate 10 POLs
+      </Button>
     </MenuSection>
   );
 };
@@ -69,6 +80,7 @@ OrdersListActionMenu.propTypes = {
   onToggle: PropTypes.func.isRequired,
   onExportCSV: PropTypes.func.isRequired,
   generateOrders: PropTypes.func.isRequired,
+  generatePOLs: PropTypes.func.isRequired,
 };
 
 export default OrdersListActionMenu;

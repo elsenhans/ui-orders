@@ -63,6 +63,7 @@ function OrdersList({
   refreshList,
   onExportCSV,
   generateOrders,
+  generatePOLs,
 }) {
   const [
     filters,
@@ -106,9 +107,10 @@ function OrdersList({
         onToggle={onToggle}
         onExportCSV={onExportCSV}
         generateOrders={generateOrders}
+        generatePOLs={generatePOLs}
       />
     ),
-    [location.search, ordersCount, onExportCSV, generateOrders],
+    [location.search, ordersCount, onExportCSV, generateOrders, generatePOLs],
   );
 
   return (
@@ -194,6 +196,7 @@ OrdersList.propTypes = {
   refreshList: PropTypes.func.isRequired,
   onExportCSV: PropTypes.func.isRequired,
   generateOrders: PropTypes.func.isRequired,
+  generatePOLs: PropTypes.func.isRequired,
 };
 
 OrdersList.defaultProps = {
