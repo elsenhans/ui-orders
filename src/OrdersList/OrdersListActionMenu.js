@@ -68,7 +68,7 @@ const OrdersListActionMenu = ({ search, ordersCount, onToggle, onExportCSV, gene
           generatePOLs();
         }}
       >
-        Generate 100 POLs
+        Generate 300 POLs
       </Button>
     </MenuSection>
   );

@@ -7,6 +7,7 @@ import { omit, random } from 'lodash';
 
 import { getFullName, exportCsv } from '@folio/stripes/util';
 import { stripesConnect } from '@folio/stripes/core';
+import { LoadingPane } from '@folio/stripes/components';
 import {
   batchFetch,
   makeQueryBuilder,
@@ -49,6 +50,7 @@ const OrdersListContainer = ({ mutator, location }) => {
   const [vendorsMap, setVendorsMap] = useState({});
   const [acqUnitsMap, setAcqUnitsMap] = useState({});
   const [usersMap, setUsersMap] = useState({});
+  const [isExporting, setIsExporting] = useState(false);
 
   const loadOrders = useCallback(async (offset) => {
     return mutator.ordersListRecords.GET({
@@ -175,9 +177,9 @@ const OrdersListContainer = ({ mutator, location }) => {
 
     while (hasData) {
       try {
-        mutator.ordersListRecords.reset();
+        mutator.orderLines.reset();
         // eslint-disable-next-line no-await-in-loop
-        const { poLines } = await mutator.orderLines.GET({
+        const poLines = await mutator.orderLines.GET({
           params: {
             limit,
             offset,
@@ -200,22 +202,23 @@ const OrdersListContainer = ({ mutator, location }) => {
   []);
 
   const onExportCSV = useCallback(async () => {
+    setIsExporting(true);
     const orderRecords = await fetchReportOrdersData();
     const linesRecords = await fetchReportLinesData(orderRecords);
-    const orderLinesMap = linesRecords.reduce((acc, line) => {
-      if (acc[line.purchaseOrderId]) {
-        acc[line.purchaseOrderId].push(line);
-      } else acc[line.purchaseOrderId] = [line];
+    const ordersMap = orderRecords.reduce((acc, ord) => {
+      acc[ord.id] = ord;
 
       return acc;
     }, {});
 
-    const exportData = orderRecords.map(orderRecord => ({
-      ...orderRecord,
-      compositePoLines: orderLinesMap[orderRecord.id],
+    const exportData = linesRecords.map(lineRecord => ({
+      ...lineRecord,
+      ...ordersMap[lineRecord.purchaseOrderId],
     }));
 
-    return exportCsv(exportData, {});
+    setIsExporting(false);
+
+    return exportCsv(exportData, { excludeFields: ['id'] });
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [location.search, fetchReportOrdersData, fetchReportLinesData]);
@@ -260,7 +263,7 @@ const OrdersListContainer = ({ mutator, location }) => {
         quantityPhysical: 1,
       }],
     };
-    const generetedPOLs = new Array(100).fill().map(() => {
+    const generetedPOLs = new Array(300).fill().map(() => {
       return ({
         ...testPOL,
         purchaseOrderId: orders[random(0, orders.length - 1)].id,
@@ -273,6 +276,8 @@ const OrdersListContainer = ({ mutator, location }) => {
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [refreshList, orders]);
+
+  if (isExporting) return <LoadingPane />;
 
   return (
     <OrdersList
