@@ -8,8 +8,10 @@ import {
 import ReactRouterPropTypes from 'react-router-prop-types';
 
 import {
+  Modal,
   MultiColumnList,
   Paneset,
+  Loading,
 } from '@folio/stripes/components';
 import {
   FiltersPane,
@@ -64,6 +66,7 @@ function OrdersList({
   onExportCSV,
   generateOrders,
   generatePOLs,
+  isExporting,
 }) {
   const [
     filters,
@@ -172,6 +175,16 @@ function OrdersList({
         />
       </ResultsPane>
 
+      {isExporting && (
+        <Modal
+          open
+          label="Export results (CSV)"
+        >
+          Exporting results
+          <Loading />
+        </Modal>
+      )}
+
       <Route
         path="/orders/view/:id"
         render={props => (
@@ -197,12 +210,14 @@ OrdersList.propTypes = {
   onExportCSV: PropTypes.func.isRequired,
   generateOrders: PropTypes.func.isRequired,
   generatePOLs: PropTypes.func.isRequired,
+  isExporting: PropTypes.bool,
 };
 
 OrdersList.defaultProps = {
   ordersCount: 0,
   isLoading: false,
   orders: [],
+  isExporting: false,
 };
 
 export default withRouter(OrdersList);

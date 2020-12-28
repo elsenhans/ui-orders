@@ -7,7 +7,6 @@ import { omit, random } from 'lodash';
 
 import { getFullName, exportCsv } from '@folio/stripes/util';
 import { stripesConnect } from '@folio/stripes/core';
-import { LoadingPane } from '@folio/stripes/components';
 import {
   batchFetch,
   makeQueryBuilder,
@@ -277,8 +276,6 @@ const OrdersListContainer = ({ mutator, location }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   [refreshList, orders]);
 
-  if (isExporting) return <LoadingPane />;
-
   return (
     <OrdersList
       ordersCount={ordersCount}
@@ -290,6 +287,7 @@ const OrdersListContainer = ({ mutator, location }) => {
       onExportCSV={onExportCSV}
       generateOrders={generateOrders}
       generatePOLs={generatePOLs}
+      isExporting={isExporting}
     />
   );
 };
