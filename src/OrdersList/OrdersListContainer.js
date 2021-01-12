@@ -158,7 +158,7 @@ const OrdersListContainer = ({ mutator, location }) => {
   [location.search]);
 
   const fetchReportLinesData = useCallback(async (purchaseOrders) => {
-    const ordersIds = chunk(purchaseOrders.map(({ id }) => id), 25);
+    const ordersIds = chunk(purchaseOrders.map(({ id }) => id), 10);
     const buildLinesQuery = (itemsChunk) => {
       const query = itemsChunk
         .map(id => `purchaseOrderId==${id}`)
