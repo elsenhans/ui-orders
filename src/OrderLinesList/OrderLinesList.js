@@ -13,6 +13,8 @@ import ReactRouterPropTypes from 'react-router-prop-types';
 import {
   MultiColumnList,
   Paneset,
+  Loading,
+  Modal,
 } from '@folio/stripes/components';
 import {
   FiltersPane,
@@ -31,6 +33,7 @@ import OrdersNavigation from '../common/OrdersNavigation';
 import OrderLinesFiltersContainer from './OrderLinesFiltersContainer';
 import Details from './Details';
 import { searchableIndexes } from './OrdersLinesSearchConfig';
+import OrderLinesListActionMenu from './OrderLinesListActionMenu';
 
 const VENDOR_REF_NUMBER = 'vendorDetail.refNumber';
 const UPDATED_DATE = 'metadata.updatedDate';
@@ -65,6 +68,8 @@ function OrderLinesList({
   orderLines,
   orderLinesCount,
   refreshList,
+  onExportCSV,
+  isExporting,
 }) {
   const [
     filters,
@@ -101,6 +106,17 @@ function OrderLinesList({
     />
   );
 
+  const renderActionMenu = useCallback(
+    ({ onToggle }) => (
+      <OrderLinesListActionMenu
+        orderLinesCount={orderLinesCount}
+        onToggle={onToggle}
+        onExportCSV={onExportCSV}
+      />
+    ),
+    [orderLinesCount, onExportCSV],
+  );
+
   return (
     <Paneset data-test-order-line-instances>
       {isFiltersOpened && (
@@ -132,6 +148,7 @@ function OrderLinesList({
 
       <ResultsPane
         count={orderLinesCount}
+        renderActionMenu={renderActionMenu}
         filters={filters}
         isFiltersOpened={isFiltersOpened}
         title={title}
@@ -158,6 +175,16 @@ function OrderLinesList({
         />
       </ResultsPane>
 
+      {isExporting && (
+        <Modal
+          open
+          label="Export results (CSV)"
+        >
+          Exporting results
+          <Loading />
+        </Modal>
+      )}
+
       <Route
         exact
         path="/orders/lines/view/:id"
@@ -181,6 +208,8 @@ OrderLinesList.propTypes = {
   history: ReactRouterPropTypes.history.isRequired,
   location: ReactRouterPropTypes.location.isRequired,
   refreshList: PropTypes.func.isRequired,
+  onExportCSV: PropTypes.func.isRequired,
+  isExporting: PropTypes.bool.isRequired,
 };
 
 OrderLinesList.defaultProps = {

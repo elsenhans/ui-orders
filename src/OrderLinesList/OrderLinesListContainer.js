@@ -8,12 +8,15 @@ import {
 } from 'react-router-dom';
 import ReactRouterPropTypes from 'react-router-prop-types';
 import queryString from 'query-string';
+import { chunk } from 'lodash';
 
 import { stripesConnect } from '@folio/stripes/core';
+import { exportCsv } from '@folio/stripes/util';
 import {
   SEARCH_INDEX_PARAMETER,
   SEARCH_PARAMETER,
   useList,
+  batchFetch,
 } from '@folio/stripes-acq-components';
 
 import {
@@ -35,6 +38,7 @@ const resetData = () => { };
 const OrderLinesListContainer = ({ mutator, location }) => {
   const [isbnId, setIsbnId] = useState();
   const [ordersMap, setOrdersMap] = useState({});
+  const [isExporting, setIsExporting] = useState(false);
 
   const loadOrderLines = useCallback(async (offset, hasFilters) => {
     const queryParams = queryString.parse(location.search);
@@ -107,6 +111,79 @@ const OrderLinesListContainer = ({ mutator, location }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ordersMap]);
 
+  const fetchReportOrderLinesData = useCallback(async () => {
+    const limit = 1000;
+    const data = [];
+    let offset = 0;
+    let hasData = true;
+
+    while (hasData) {
+      try {
+        mutator.orderLinesListRecords.reset();
+        // eslint-disable-next-line no-await-in-loop
+        const { poLines } = await mutator.orderLinesListRecords.GET({
+          params: {
+            query: buildOrderLinesQuery(queryString.parse(location.search)),
+            limit,
+            offset,
+          },
+        });
+
+        hasData = poLines.length;
+        offset += limit;
+        if (hasData) {
+          data.push(...poLines);
+        }
+      } catch (e) {
+        hasData = false;
+      }
+    }
+
+    return data;
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [location.search]);
+
+  const fetchReportOrdersData = useCallback(async (poLines) => {
+    const ordersIds = chunk(poLines.map(({ purchaseOrderId }) => purchaseOrderId), 50);
+
+    const fetchBatchOrders = (batchIds) => {
+      return batchFetch(mutator.lineOrders, batchIds);
+    };
+
+    return ordersIds.reduce((acc, nextBatch) => {
+      return acc.then(prevOrdersResp => {
+        return fetchBatchOrders(nextBatch).then(nextOrdersResp => {
+          return [...prevOrdersResp, ...nextOrdersResp];
+        });
+      });
+    }, Promise.resolve([]));
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  []);
+
+  const onExportCSV = useCallback(async () => {
+    setIsExporting(true);
+    const orderLinesRecords = await fetchReportOrderLinesData();
+    const ordersRecords = await fetchReportOrdersData(orderLinesRecords);
+    const ordersRecordsMap = ordersRecords.reduce((acc, ord) => {
+      acc[ord.id] = ord;
+
+      return acc;
+    }, {});
+
+    const exportData = orderLinesRecords.map(lineRecord => ({
+      ...lineRecord,
+      ...ordersRecordsMap[lineRecord.purchaseOrderId],
+    }));
+
+    setIsExporting(false);
+
+    return exportCsv(exportData, { excludeFields: ['id'] });
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [location.search, fetchReportOrdersData, fetchReportOrderLinesData]);
+
   const {
     records: orderLines,
     recordsCount: orderLinesCount,
@@ -123,6 +200,8 @@ const OrderLinesListContainer = ({ mutator, location }) => {
       orderLines={orderLines}
       refreshList={refreshList}
       resetData={resetData}
+      isExporting={isExporting}
+      onExportCSV={onExportCSV}
     />
   );
 };
