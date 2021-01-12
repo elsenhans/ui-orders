@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import ReactRouterPropTypes from 'react-router-prop-types';
 import queryString from 'query-string';
-import { omit, random } from 'lodash';
+import { omit, random, chunk } from 'lodash';
 
 import { getFullName, exportCsv } from '@folio/stripes/util';
 import { stripesConnect } from '@folio/stripes/core';
@@ -158,44 +158,26 @@ const OrdersListContainer = ({ mutator, location }) => {
   [location.search]);
 
   const fetchReportLinesData = useCallback(async (purchaseOrders) => {
-    // const ordersIds = purchaseOrders.map(({ id }) => id);
-    // const buildLinesQuery = (itemsChunk) => {
-    //   const query = itemsChunk
-    //     .map(id => `purchaseOrderId==${id}`)
-    //     .join(' or ');
+    const ordersIds = chunk(purchaseOrders.map(({ id }) => id), 50);
+    const buildLinesQuery = (itemsChunk) => {
+      const query = itemsChunk
+        .map(id => `purchaseOrderId==${id}`)
+        .join(' or ');
 
-    //   return query || '';
-    // };
+      return query || '';
+    };
 
-    // return batchFetch(mutator.orderLines, ordersIds, buildLinesQuery);
+    const fetchBatchLines = (batchIds) => {
+      return batchFetch(mutator.orderLines, batchIds, buildLinesQuery);
+    };
 
-    const limit = 1000;
-    const data = [];
-    let offset = 0;
-    let hasData = true;
-
-    while (hasData) {
-      try {
-        mutator.orderLines.reset();
-        // eslint-disable-next-line no-await-in-loop
-        const poLines = await mutator.orderLines.GET({
-          params: {
-            limit,
-            offset,
-          },
+    return ordersIds.reduce((acc, nextBatch) => {
+      return acc.then(prevLinesResp => {
+        return fetchBatchLines(nextBatch).then(nextLinesResp => {
+          return [...prevLinesResp, ...nextLinesResp];
         });
-
-        hasData = poLines.length;
-        offset += limit;
-        if (hasData) {
-          data.push(...poLines);
-        }
-      } catch (e) {
-        hasData = false;
-      }
-    }
-
-    return data;
+      });
+    }, Promise.resolve([]));
   },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   []);
