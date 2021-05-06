@@ -139,3 +139,4 @@ jobs:
           method: 'POST'
           username: ${{ secrets.FOLIO_REGISTRY_USERNAME }}
           password: ${{  secrets.FOLIO_REGISTRY_PASSWORD }}
+      - run: echo 'Publish mod descriptor step'
