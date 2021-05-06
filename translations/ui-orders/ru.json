@@ -171,7 +171,7 @@
     "line.accordion.itemDetails": "Item details",
     "line.accordion.physical": "Physical resource details",
     "line.accordion.vendor": "Поставщик",
-    "line.paneTitle.details": "Детали",
+    "line.paneTitle.details": "PO Line details - {poLineNumber}",
     "line.paneTitle.edit": "Edit - {lineNumber}",
     "line.paneTitle.new": "Add PO line",
     "orderDetails.orderNumberPrefix": "Префикс",
@@ -666,5 +666,7 @@
     "permission.settings.view": "Settings (Orders): Can view all settings",
     "vendor.referenceNumbers": "Vendor reference numbers",
     "lineListing.refNumber": "Vendor reference number",
-    "search.vendorDetail.referenceNumbers": "Vendor reference number"
+    "search.vendorDetail.referenceNumbers": "Vendor reference number",
+    "payment_status.ongoing": "Ongoing",
+    "receipt_status.ongoing": "Ongoing"
 }

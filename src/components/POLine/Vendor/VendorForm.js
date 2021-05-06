@@ -18,8 +18,8 @@ const VendorForm = ({
   order,
 }) => {
   const isPostPendingOrder = !isWorkflowStatusIsPending(order);
-  const accountsDataOptions = accounts.map(({ accountNo }) => ({
-    label: accountNo,
+  const accountsDataOptions = accounts.map(({ name, accountNo }) => ({
+    label: `${name} (${accountNo})`,
     value: accountNo,
   }));
 

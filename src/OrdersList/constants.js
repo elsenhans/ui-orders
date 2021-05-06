@@ -20,6 +20,7 @@ export const FILTERS = {
   PO_NUMBER: 'poNumber',
   PREFIX: 'poNumberPrefix',
   RE_ENCUMBER: 'reEncumber',
+  SUBSCRIPTION: 'ongoing.isSubscription',
   RENEWAL_DATE: 'ongoing.renewalDate',
   RENEWAL_REVIEW_PERIOD: 'ongoing.reviewPeriod',
   SHIP_TO: 'shipTo',

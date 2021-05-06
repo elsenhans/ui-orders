@@ -2,6 +2,7 @@ import { describe, beforeEach, it } from '@bigtest/mocha';
 import { expect } from 'chai';
 
 import setupApplication from '../../helpers/setup-application';
+import { TIMEOUT } from '../../interactors/const';
 import CloseOrderModal from '../../interactors/PurchaseOrder/close-order-modal';
 import OrderDetailsPage from '../../interactors/order-details-page';
 import { WORKFLOW_STATUS } from '../../../../src/common/constants';
@@ -14,6 +15,8 @@ describe('Close Order Modal', function () {
   let order = null;
   const modal = new CloseOrderModal();
   const page = new OrderDetailsPage();
+
+  this.timeout(TIMEOUT);
 
   beforeEach(async function () {
     order = this.server.create('order', {

@@ -666,5 +666,7 @@
     "permission.settings.view": "设置（订单）：可查看所有设置",
     "vendor.referenceNumbers": "供应商参考号",
     "lineListing.refNumber": "供应商参考号",
-    "search.vendorDetail.referenceNumbers": "供应商参考号"
+    "search.vendorDetail.referenceNumbers": "供应商参考号",
+    "payment_status.ongoing": "Ongoing",
+    "receipt_status.ongoing": "Ongoing"
 }

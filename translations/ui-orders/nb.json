@@ -666,5 +666,7 @@
     "permission.settings.view": "Settings (Orders): Can view all settings",
     "vendor.referenceNumbers": "Vendor reference numbers",
     "lineListing.refNumber": "Vendor reference number",
-    "search.vendorDetail.referenceNumbers": "Vendor reference number"
+    "search.vendorDetail.referenceNumbers": "Vendor reference number",
+    "payment_status.ongoing": "Ongoing",
+    "receipt_status.ongoing": "Ongoing"
 }

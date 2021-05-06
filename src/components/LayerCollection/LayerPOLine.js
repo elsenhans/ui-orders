@@ -6,7 +6,6 @@ import {
   get,
 } from 'lodash';
 import ReactRouterPropTypes from 'react-router-prop-types';
-import SafeHTMLMessage from '@folio/react-intl-safe-html';
 
 import {
   stripesConnect,
@@ -123,13 +122,13 @@ function LayerPOLine({
           const messageCode = get(ERROR_CODES, response.errors[0].code, 'orderLineGenericError');
 
           sendCallout({
-            message: <SafeHTMLMessage id={`ui-orders.errors.${messageCode}`} />,
+            message: <FormattedMessage id={`ui-orders.errors.${messageCode}`} />,
             type: 'error',
           });
         }
       } else {
         sendCallout({
-          message: <SafeHTMLMessage id="ui-orders.errors.orderLineGenericError" />,
+          message: <FormattedMessage id="ui-orders.errors.orderLineGenericError" />,
           type: 'error',
         });
       }
@@ -146,7 +145,7 @@ function LayerPOLine({
           .then(() => {
             sendCallout({
               message: (
-                <SafeHTMLMessage
+                <FormattedMessage
                   id="ui-orders.order.open.success"
                   values={{ orderNumber: order.poNumber }}
                 />
@@ -157,7 +156,7 @@ function LayerPOLine({
           .catch(errorResponse => {
             sendCallout({
               message: (
-                <SafeHTMLMessage
+                <FormattedMessage
                   id="ui-orders.errors.openOrder"
                   values={{ orderNumber: order.poNumber }}
                 />
@@ -181,7 +180,7 @@ function LayerPOLine({
       .then(({ id: poLineId }) => Promise.all([poLineId, openOrder(saveAndOpen)]))
       .then(([poLineId]) => {
         sendCallout({
-          message: <SafeHTMLMessage id="ui-orders.line.create.success" />,
+          message: <FormattedMessage id="ui-orders.line.create.success" />,
           type: 'success',
         });
 
@@ -258,7 +257,7 @@ function LayerPOLine({
       .then(() => {
         sendCallout({
           message: (
-            <SafeHTMLMessage
+            <FormattedMessage
               id="ui-orders.line.update.success"
               values={{ lineNumber: line.poLineNumber }}
             />

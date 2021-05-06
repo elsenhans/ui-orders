@@ -40,7 +40,7 @@ const getLocationData = (line, locationMap) => (
 );
 
 const getAddressData = (addressId, addressMap) => (
-  addressId ? `"${addressMap[addressId].name}""${addressMap[addressId].address}"` : ''
+  addressMap[addressId] ? `"${addressMap[addressId].name}""${addressMap[addressId].address}"` : ''
 );
 
 const getReferenceNumbers = (line) => (
@@ -78,12 +78,15 @@ export const createExportReport = (
   return poLines.map(lineRecord => ({
     poNumber: ordersMap[lineRecord.purchaseOrderId].poNumber,
     vendor: vendorMap[ordersMap[lineRecord.purchaseOrderId].vendor].code,
+    vendorRecord: vendorMap[ordersMap[lineRecord.purchaseOrderId].vendor],
     orderType: ordersMap[lineRecord.purchaseOrderId].orderType,
     acquisitionsUnits: ordersMap[lineRecord.purchaseOrderId].acqUnitIds.map(id => acqUnitMap[id].name).join(' | '),
     approvalDate: formatDateTime(ordersMap[lineRecord.purchaseOrderId].approvalDate, intl),
     assignedTo: userMap[ordersMap[lineRecord.purchaseOrderId].assignedTo]?.username,
     billTo: getAddressData(ordersMap[lineRecord.purchaseOrderId]?.billTo, addressMap),
+    billToRecord: addressMap[ordersMap[lineRecord.purchaseOrderId]?.billTo],
     shipTo: getAddressData(ordersMap[lineRecord.purchaseOrderId]?.shipTo, addressMap),
+    shipToRecord: addressMap[ordersMap[lineRecord.purchaseOrderId]?.shipTo],
     manualPo: ordersMap[lineRecord.purchaseOrderId].manualPo,
     reEncumber: ordersMap[lineRecord.purchaseOrderId].reEncumber,
     createdByUserId: userMap[ordersMap[lineRecord.purchaseOrderId].metadata?.createdByUserId]?.username,

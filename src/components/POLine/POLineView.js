@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { FormattedMessage } from 'react-intl';
 import { withRouter } from 'react-router-dom';
 import ReactRouterPropTypes from 'react-router-prop-types';
+import { useReactToPrint } from 'react-to-print';
 
 import { IfPermission } from '@folio/stripes/core';
 import {
@@ -30,8 +31,15 @@ import {
   FundDistributionView,
   ORDER_FORMATS,
   TagsBadge,
+  useAcqRestrictions,
+  useModalToggle,
 } from '@folio/stripes-acq-components';
 
+import { PrintSettingsModalContainer } from '../../common/ExportSettingsModal';
+import {
+  hydrateOrderToPrint,
+  PrintContent,
+} from '../../PrintOrder';
 import {
   isCheckInAvailableForLine,
   isReceiveAvailableForLine,
@@ -49,6 +57,7 @@ import CostView from './Cost/CostView';
 import VendorView from './Vendor/VendorView';
 import EresourcesView from './Eresources/EresourcesView';
 import ItemView from './Item/ItemView';
+import { LineLinkedInstances } from './LineLinkedInstances';
 import PhysicalView from './Physical/PhysicalView';
 import { OtherView } from './Other';
 import POLineInvoicesContainer from './POLineInvoices';
@@ -60,89 +69,75 @@ import {
 } from './const';
 import { FILTERS as ORDER_FILTERS } from '../../OrdersList/constants';
 
-class POLineView extends Component {
-  static propTypes = {
-    history: ReactRouterPropTypes.history.isRequired,
-    poURL: PropTypes.string,
-    location: ReactRouterPropTypes.location.isRequired,
-    locations: PropTypes.arrayOf(PropTypes.object),
-    order: PropTypes.object,
-    line: PropTypes.object,
-    match: ReactRouterPropTypes.match.isRequired,
-    materialTypes: PropTypes.arrayOf(PropTypes.object),
-    onClose: PropTypes.func,
-    editable: PropTypes.bool,
-    goToOrderDetails: PropTypes.func,
-    deleteLine: PropTypes.func,
-    tagsToggle: PropTypes.func.isRequired,
-  }
+const POLineView = ({
+  deleteLine,
+  editable,
+  goToOrderDetails,
+  history,
+  line,
+  location,
+  locations,
+  match: { params: { lineId } },
+  materialTypes,
+  onClose,
+  order,
+  poURL,
+  tagsToggle,
+}) => {
+  const [sections, setSections] = useState({
+    CostDetails: true,
+    Vendor: true,
+    FundDistribution: true,
+    ItemDetails: true,
+    Renewal: true,
+    [ACCORDION_ID.eresources]: true,
+    [ACCORDION_ID.location]: true,
+    [ACCORDION_ID.other]: true,
+    [ACCORDION_ID.physical]: true,
+    [ACCORDION_ID.relatedInvoices]: true,
+    [ACCORDION_ID.notes]: true,
+    [ACCORDION_ID.poLine]: true,
+    [ACCORDION_ID.linkedInstances]: false,
+  });
+  const [showConfirmDelete, toggleConfirmDelete] = useModalToggle();
+  const [isPrintModalOpened, togglePrintModal] = useModalToggle();
 
-  static defaultProps = {
-    locations: [],
-    materialTypes: [],
-    editable: true,
-  }
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      sections: {
-        CostDetails: true,
-        Vendor: true,
-        FundDistribution: true,
-        ItemDetails: true,
-        Renewal: true,
-        [ACCORDION_ID.eresources]: true,
-        [ACCORDION_ID.location]: true,
-        [ACCORDION_ID.other]: true,
-        [ACCORDION_ID.physical]: true,
-        [ACCORDION_ID.relatedInvoices]: true,
-        [ACCORDION_ID.notes]: true,
-      },
-      showConfirmDelete: false,
-    };
-  }
-
-  onToggleSection = ({ id }) => {
-    this.setState(({ sections }) => {
-      const isSectionOpened = sections[id];
+  const onToggleSection = useCallback(({ id }) => {
+    setSections((prevSections) => {
+      const isSectionOpened = prevSections[id];
 
       return {
-        sections: {
-          ...sections,
-          [id]: !isSectionOpened,
-        },
+        ...prevSections,
+        [id]: !isSectionOpened,
       };
     });
-  }
+  }, []);
 
-  handleExpandAll = (sections) => {
-    this.setState({ sections });
-  }
+  const handleExpandAll = useCallback((newSections) => {
+    setSections(newSections);
+  }, []);
 
-  onEditPOLine = (e) => {
+  const onEditPOLine = useCallback((e) => {
     if (e) e.preventDefault();
-    const { match: { params: { lineId } }, history, location, order, line } = this.props;
     const search = lineId ? location.search : `qindex=${ORDER_FILTERS.PO_NUMBER}&query=${order.poNumber}`;
 
     history.push({
       pathname: `/orders/view/${order.id}/po-line/edit/${line.id}`,
       search,
     });
-  };
+  }, [history, line.id, lineId, location.search, order.id, order.poNumber]);
 
-  mountDeleteLineConfirm = () => this.setState({ showConfirmDelete: true });
+  const onConfirmDelete = useCallback(() => {
+    toggleConfirmDelete();
+    deleteLine();
+  }, [deleteLine, toggleConfirmDelete]);
 
-  unmountDeleteLineConfirm = () => this.setState({ showConfirmDelete: false });
+  const { restrictions, isLoading: isRestrictionsLoading } = useAcqRestrictions(
+    order?.id, order?.acqUnitIds,
+  );
 
-  onConfirmDelete = () => {
-    this.unmountDeleteLineConfirm();
-    this.props.deleteLine();
-  }
-
-  getActionMenu = ({ onToggle }) => {
-    const { goToOrderDetails, editable, line, order } = this.props;
-
+  // eslint-disable-next-line react/prop-types
+  const getActionMenu = ({ onToggle }) => {
     const isReceiveButtonVisible = isReceiveAvailableForLine(line, order);
     const isCheckInButtonVisible = isCheckInAvailableForLine(line, order);
 
@@ -154,9 +149,10 @@ class POLineView extends Component {
             <Button
               buttonStyle="dropdownItem"
               data-test-button-edit-line
+              disabled={isRestrictionsLoading || restrictions.protectUpdate}
               onClick={() => {
                 onToggle();
-                this.onEditPOLine();
+                onEditPOLine();
               }}
             >
               <Icon size="small" icon="edit">
@@ -196,9 +192,10 @@ class POLineView extends Component {
           <Button
             buttonStyle="dropdownItem"
             data-test-button-delete-line
+            disabled={isRestrictionsLoading || restrictions.protectDelete}
             onClick={() => {
               onToggle();
-              this.mountDeleteLineConfirm();
+              toggleConfirmDelete();
             }}
           >
             <Icon size="small" icon="trash">
@@ -206,204 +203,257 @@ class POLineView extends Component {
             </Icon>
           </Button>
         </IfPermission>
+        <Button
+          buttonStyle="dropdownItem"
+          onClick={() => {
+            onToggle();
+            togglePrintModal();
+          }}
+        >
+          <Icon size="small" icon="print">
+            <FormattedMessage id="ui-orders.button.print" />
+          </Icon>
+        </Button>
       </MenuSection>
     );
   };
 
-  render() {
-    const {
-      onClose,
-      poURL,
-      order,
-      line,
-      materialTypes,
-      locations,
-      tagsToggle,
-    } = this.props;
-    const tags = get(line, ['tags', 'tagList'], []);
+  const tags = get(line, ['tags', 'tagList'], []);
 
-    const firstMenu = (
-      <PaneMenu>
-        <IconButton
-          icon="arrow-left"
-          id="clickable-backToPO"
-          onClick={onClose}
-          title="Back to PO"
-        />
-      </PaneMenu>);
-    const lastMenu = (
-      <PaneMenu>
-        <TagsBadge
-          tagsToggle={tagsToggle}
-          tagsQuantity={tags.length}
-        />
-      </PaneMenu>
-    );
+  const firstMenu = (
+    <PaneMenu>
+      <IconButton
+        icon="arrow-left"
+        id="clickable-backToPO"
+        onClick={onClose}
+        title="Back to PO"
+      />
+    </PaneMenu>);
+  const lastMenu = (
+    <PaneMenu>
+      <TagsBadge
+        tagsToggle={tagsToggle}
+        tagsQuantity={tags.length}
+      />
+    </PaneMenu>
+  );
 
-    const orderFormat = get(line, 'orderFormat');
-    const poLineNumber = line.poLineNumber;
-    const showEresources = ERESOURCES.includes(orderFormat);
-    const showPhresources = PHRESOURCES.includes(orderFormat);
-    const showOther = orderFormat === ORDER_FORMATS.other;
-    const estimatedPrice = get(line, ['cost', 'poLineEstimatedPrice'], 0);
-    const fundDistributions = get(line, 'fundDistribution');
-    const currency = get(line, 'cost.currency');
-    const metadata = get(line, 'metadata');
-    const isClosedOrder = isWorkflowStatusClosed(order);
-    const paneTitle = <FormattedMessage id="ui-orders.line.paneTitle.details" values={{ poLineNumber }} />;
+  const orderFormat = get(line, 'orderFormat');
+  const poLineNumber = line.poLineNumber;
+  const showEresources = ERESOURCES.includes(orderFormat);
+  const showPhresources = PHRESOURCES.includes(orderFormat);
+  const showOther = orderFormat === ORDER_FORMATS.other;
+  const estimatedPrice = get(line, ['cost', 'poLineEstimatedPrice'], 0);
+  const fundDistributions = get(line, 'fundDistribution');
+  const currency = get(line, 'cost.currency');
+  const metadata = get(line, 'metadata');
+  const isClosedOrder = isWorkflowStatusClosed(order);
+  const paneTitle = <FormattedMessage id="ui-orders.line.paneTitle.details" values={{ poLineNumber }} />;
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+  const [orderToPrint, setOrderToPrint] = useState();
+  const printOrderModal = (exportData) => {
+    setOrderToPrint(exportData);
+    handlePrint();
+  };
+  const hydratedOrderToPrint = useMemo(() => {
+    return hydrateOrderToPrint({ order: orderToPrint });
+  }, [orderToPrint]);
 
-    return (
-      <Pane
-        defaultWidth="fill"
-        firstMenu={poURL ? firstMenu : null}
-        actionMenu={this.getActionMenu}
-        dismissible={!poURL}
-        onClose={onClose}
-        id="pane-poLineDetails"
-        lastMenu={lastMenu}
-        paneTitle={paneTitle}
+  return (
+    <Pane
+      id="order-lines-details"
+      defaultWidth="fill"
+      firstMenu={poURL ? firstMenu : null}
+      actionMenu={getActionMenu}
+      dismissible={!poURL}
+      onClose={onClose}
+      lastMenu={lastMenu}
+      paneTitle={paneTitle}
+    >
+      <AccordionSet
+        accordionStatus={sections}
+        onToggle={onToggleSection}
       >
-        <AccordionSet
-          accordionStatus={this.state.sections}
-          onToggle={this.onToggleSection}
+        <Row end="xs">
+          <Col xs={10}>
+            {isClosedOrder && (
+              <MessageBanner type="warning">
+                <FormattedMessage
+                  id="ui-orders.line.closedOrderMessage"
+                  values={{ reason: order.closeReason?.reason }}
+                />
+              </MessageBanner>
+            )}
+          </Col>
+          <Col xs={2}>
+            <ExpandAllButton
+              accordionStatus={sections}
+              onToggle={handleExpandAll}
+            />
+          </Col>
+        </Row>
+        <Accordion
+          label={<FormattedMessage id="ui-orders.line.accordion.itemDetails" />}
+          id="ItemDetails"
         >
-          <Row end="xs">
-            <Col xs={10}>
-              {isClosedOrder && (
-                <MessageBanner type="warning">
-                  <FormattedMessage
-                    id="ui-orders.line.closedOrderMessage"
-                    values={{ reason: order.closeReason?.reason }}
-                  />
-                </MessageBanner>
-              )}
-            </Col>
-            <Col xs={2}>
-              <ExpandAllButton
-                accordionStatus={this.state.sections}
-                onToggle={this.handleExpandAll}
-              />
-            </Col>
-          </Row>
-          <Accordion
-            label={<FormattedMessage id="ui-orders.line.accordion.itemDetails" />}
-            id="ItemDetails"
-          >
-            {metadata && <ViewMetaData metadata={metadata} />}
+          {metadata && <ViewMetaData metadata={metadata} />}
 
-            <ItemView poLineDetails={line} />
-          </Accordion>
-          <Accordion
-            label={<FormattedMessage id="ui-orders.line.accordion.poLine" />}
-            id={ACCORDION_ID.poLine}
-          >
-            <POLineDetails line={line} />
-          </Accordion>
-          <Accordion
-            label={<FormattedMessage id="ui-orders.line.accordion.vendor" />}
-            id="Vendor"
-          >
-            <VendorView vendorDetail={line.vendorDetail} />
-          </Accordion>
-          <Accordion
-            label={<FormattedMessage id="ui-orders.line.accordion.cost" />}
-            id="CostDetails"
-          >
-            <CostView
-              cost={line.cost}
-              isPackage={line.isPackage}
-              orderFormat={orderFormat}
-            />
-          </Accordion>
-          <Accordion
-            label={<FormattedMessage id="ui-orders.line.accordion.fund" />}
-            id="FundDistribution"
-          >
-            <FundDistributionView
-              currency={currency}
-              fundDistributions={fundDistributions}
-              totalAmount={estimatedPrice}
-            />
-          </Accordion>
-          <Accordion
-            label={<FormattedMessage id="ui-orders.line.accordion.location" />}
-            id={ACCORDION_ID.location}
-          >
-            <LocationView
-              lineLocations={line.locations}
-              locations={locations}
-            />
-          </Accordion>
-          {showPhresources && (
-            <Accordion
-              label={<FormattedMessage id="ui-orders.line.accordion.physical" />}
-              id={ACCORDION_ID.physical}
-            >
-              <PhysicalView
-                materialTypes={materialTypes}
-                physical={get(line, 'physical', {})}
-              />
-            </Accordion>
-          )}
-          {showEresources && (
-            <Accordion
-              label={<FormattedMessage id="ui-orders.line.accordion.eresource" />}
-              id={ACCORDION_ID.eresources}
-            >
-              <EresourcesView
-                line={line}
-                materialTypes={materialTypes}
-                order={order}
-              />
-            </Accordion>
-          )}
-          {showOther && (
-            <Accordion
-              label={<FormattedMessage id="ui-orders.line.accordion.other" />}
-              id={ACCORDION_ID.other}
-            >
-              <OtherView
-                materialTypes={materialTypes}
-                physical={get(line, 'physical', {})}
-              />
-            </Accordion>
-          )}
-          <IfPermission perm="ui-notes.item.view">
-            <NotesSmartAccordion
-              domainName={ORDERS_DOMAIN}
-              entityId={line.id}
-              entityName={poLineNumber}
-              entityType={NOTE_TYPES.poLine}
-              hideAssignButton
-              id={ACCORDION_ID.notes}
-              onToggle={this.onToggleSection}
-              pathToNoteCreate={`${NOTES_ROUTE}/new`}
-              pathToNoteDetails={NOTES_ROUTE}
-            />
-          </IfPermission>
-          <POLineInvoicesContainer
-            label={<FormattedMessage id="ui-orders.line.accordion.relatedInvoices" />}
-            lineId={get(line, 'id')}
+          <ItemView poLineDetails={line} />
+        </Accordion>
+        <Accordion
+          label={<FormattedMessage id="ui-orders.line.accordion.poLine" />}
+          id={ACCORDION_ID.poLine}
+        >
+          <POLineDetails line={line} />
+        </Accordion>
+        <Accordion
+          label={<FormattedMessage id="ui-orders.line.accordion.vendor" />}
+          id="Vendor"
+        >
+          <VendorView
+            vendorDetail={line.vendorDetail}
+            vendorId={order?.vendor}
           />
-          <POLineAgreementLinesContainer
-            label={<FormattedMessage id="ui-orders.line.accordion.linkedAgreementLines" />}
-            lineId={line.id}
+        </Accordion>
+        <Accordion
+          label={<FormattedMessage id="ui-orders.line.accordion.cost" />}
+          id="CostDetails"
+        >
+          <CostView
+            cost={line.cost}
+            isPackage={line.isPackage}
+            orderFormat={orderFormat}
           />
-        </AccordionSet>
-        {this.state.showConfirmDelete && (
-          <ConfirmationModal
-            id="delete-line-confirmation"
-            confirmLabel={<FormattedMessage id="ui-orders.order.delete.confirmLabel" />}
-            heading={<FormattedMessage id="ui-orders.order.delete.heading" values={{ orderNumber: poLineNumber }} />}
-            message={<FormattedMessage id="ui-orders.line.delete.message" />}
-            onCancel={this.unmountDeleteLineConfirm}
-            onConfirm={this.onConfirmDelete}
-            open
+        </Accordion>
+        <Accordion
+          label={<FormattedMessage id="ui-orders.line.accordion.fund" />}
+          id="FundDistribution"
+        >
+          <FundDistributionView
+            currency={currency}
+            fundDistributions={fundDistributions}
+            totalAmount={estimatedPrice}
           />
+        </Accordion>
+        <Accordion
+          label={<FormattedMessage id="ui-orders.line.accordion.location" />}
+          id={ACCORDION_ID.location}
+        >
+          <LocationView
+            lineLocations={line.locations}
+            locations={locations}
+          />
+        </Accordion>
+        {showPhresources && (
+          <Accordion
+            label={<FormattedMessage id="ui-orders.line.accordion.physical" />}
+            id={ACCORDION_ID.physical}
+          >
+            <PhysicalView
+              materialTypes={materialTypes}
+              physical={get(line, 'physical', {})}
+            />
+          </Accordion>
         )}
-      </Pane>
-    );
-  }
-}
+        {showEresources && (
+          <Accordion
+            label={<FormattedMessage id="ui-orders.line.accordion.eresource" />}
+            id={ACCORDION_ID.eresources}
+          >
+            <EresourcesView
+              line={line}
+              materialTypes={materialTypes}
+              order={order}
+            />
+          </Accordion>
+        )}
+        {showOther && (
+          <Accordion
+            label={<FormattedMessage id="ui-orders.line.accordion.other" />}
+            id={ACCORDION_ID.other}
+          >
+            <OtherView
+              materialTypes={materialTypes}
+              physical={get(line, 'physical', {})}
+            />
+          </Accordion>
+        )}
+        <IfPermission perm="ui-notes.item.view">
+          <NotesSmartAccordion
+            domainName={ORDERS_DOMAIN}
+            entityId={line.id}
+            entityName={poLineNumber}
+            entityType={NOTE_TYPES.poLine}
+            hideAssignButton
+            id={ACCORDION_ID.notes}
+            onToggle={onToggleSection}
+            pathToNoteCreate={`${NOTES_ROUTE}/new`}
+            pathToNoteDetails={NOTES_ROUTE}
+          />
+        </IfPermission>
+        <POLineInvoicesContainer
+          label={<FormattedMessage id="ui-orders.line.accordion.relatedInvoices" />}
+          lineId={get(line, 'id')}
+        />
+        <POLineAgreementLinesContainer
+          label={<FormattedMessage id="ui-orders.line.accordion.linkedAgreementLines" />}
+          lineId={line.id}
+        />
+
+        <LineLinkedInstances
+          line={line}
+          toggleSection={onToggleSection}
+        />
+      </AccordionSet>
+      {showConfirmDelete && (
+        <ConfirmationModal
+          id="delete-line-confirmation"
+          confirmLabel={<FormattedMessage id="ui-orders.order.delete.confirmLabel" />}
+          heading={<FormattedMessage id="ui-orders.order.delete.heading" values={{ orderNumber: poLineNumber }} />}
+          message={<FormattedMessage id="ui-orders.line.delete.message" />}
+          onCancel={toggleConfirmDelete}
+          onConfirm={onConfirmDelete}
+          open
+        />
+      )}
+      {isPrintModalOpened && (
+        <PrintSettingsModalContainer
+          onCancel={togglePrintModal}
+          printOrder={printOrderModal}
+          orderToPrint={order}
+        />
+      )}
+      <PrintContent
+        ref={componentRef}
+        dataSource={hydratedOrderToPrint}
+      />
+    </Pane>
+  );
+};
+
+POLineView.propTypes = {
+  history: ReactRouterPropTypes.history.isRequired,
+  poURL: PropTypes.string,
+  location: ReactRouterPropTypes.location.isRequired,
+  locations: PropTypes.arrayOf(PropTypes.object),
+  order: PropTypes.object,
+  line: PropTypes.object,
+  match: ReactRouterPropTypes.match.isRequired,
+  materialTypes: PropTypes.arrayOf(PropTypes.object),
+  onClose: PropTypes.func,
+  editable: PropTypes.bool,
+  goToOrderDetails: PropTypes.func,
+  deleteLine: PropTypes.func,
+  tagsToggle: PropTypes.func.isRequired,
+};
+
+POLineView.defaultProps = {
+  locations: [],
+  materialTypes: [],
+  editable: true,
+};
 
 export default withRouter(POLineView);

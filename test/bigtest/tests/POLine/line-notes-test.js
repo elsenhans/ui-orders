@@ -4,6 +4,7 @@ import { expect } from 'chai';
 import { ORDER_FORMATS } from '@folio/stripes-acq-components';
 
 import setupApplication from '../../helpers/setup-application';
+import { TIMEOUT } from '../../interactors/const';
 import LineDetailsPage from '../../interactors/line-details-page';
 import NoteFormPage from '../../interactors/note-form-page';
 import NoteViewPage from '../../interactors/note-view-page';
@@ -11,6 +12,8 @@ import { NOTE_TYPES } from '../../../../src/common/constants';
 
 describe('PO line notes', function () {
   setupApplication();
+
+  this.timeout(TIMEOUT);
 
   const lineDetails = new LineDetailsPage();
   const noteFormPage = new NoteFormPage();

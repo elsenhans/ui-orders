@@ -6,12 +6,15 @@ import {
 import { expect } from 'chai';
 
 import setupApplication from '../../helpers/setup-application';
+import { TIMEOUT } from '../../interactors/const';
 import OrderDetailsPage from '../../interactors/order-details-page';
 
 describe('Approve order is not required', function () {
   setupApplication();
 
   const orderDetailsPage = new OrderDetailsPage();
+
+  this.timeout(TIMEOUT);
 
   beforeEach(async function () {
     const pendingOrder = this.server.create('order');

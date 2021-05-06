@@ -90,3 +90,16 @@ export const EXPORT_LINE_FIELDS_OPTIONS = Object.keys(EXPORT_LINE_FIELDS).map(fi
   label: EXPORT_LINE_FIELDS[field],
   value: field,
 }));
+
+export const PRINT_ORDER_FIELDS = {};
+export const PRINT_LINE_FIELDS = {};
+
+export const PRINT_ORDER_FIELDS_OPTIONS = Object.entries(PRINT_ORDER_FIELDS).map(([value, label]) => ({
+  label,
+  value,
+}));
+
+export const PRINT_LINE_FIELDS_OPTIONS = Object.entries(PRINT_LINE_FIELDS).map(([value, label]) => ({
+  label,
+  value,
+}));

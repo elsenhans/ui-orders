@@ -6,10 +6,12 @@ import { ORDER_FORMATS } from '@folio/stripes-acq-components';
 import setupApplication from '../../helpers/setup-application';
 import LineDetailsPage from '../../interactors/line-details-page';
 import ConfirmationModal from '../../interactors/confirmation';
+import { TIMEOUT } from '../../interactors/const';
 
 describe('Delete Order Line', function () {
   setupApplication();
 
+  this.timeout(TIMEOUT);
   const page = new LineDetailsPage();
   let order = null;
   let line = null;

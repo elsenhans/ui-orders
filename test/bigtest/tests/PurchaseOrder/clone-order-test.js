@@ -5,10 +5,12 @@ import setupApplication from '../../helpers/setup-application';
 import OrderDetailsPage from '../../interactors/order-details-page';
 import ConfirmationModal from '../../interactors/confirmation';
 import { CalloutInteractor } from '../../interactors';
+import { TIMEOUT } from '../../interactors/const';
 
 describe('Clone order', function () {
   setupApplication();
 
+  this.timeout(TIMEOUT);
   const page = new OrderDetailsPage();
   const cloneOrderConfirmation = new ConfirmationModal('#order-clone-confirmation');
   const calloutInteractor = new CalloutInteractor();

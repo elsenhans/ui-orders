@@ -62,7 +62,7 @@ const SummaryView = ({ order }) => (
           lg={3}
         >
           <TotalEncumberedValue
-            totalEncumbered={order.totalEncumbred}
+            totalEncumbered={order.totalEncumbered}
             label={<FormattedMessage id="ui-orders.orderSummary.totalEncumbered" />}
           />
         </Col>

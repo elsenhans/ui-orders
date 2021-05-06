@@ -43,7 +43,7 @@ import { TIMEOUT } from './const';
 }
 
 export default interactor(class LineDetailsPage {
-  static defaultScope = '#pane-poLineDetails';
+  static defaultScope = '#order-lines-details';
   receiveButton = new Button('[data-test-line-receive-button]');
   checkInButton = new Button('[data-test-line-check-in-button]');
   otherDetailsAccordion = isPresent('#other');

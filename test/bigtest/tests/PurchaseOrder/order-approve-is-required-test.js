@@ -14,10 +14,12 @@ import {
 } from '../../../../src/components/Utils/const';
 import setupApplication from '../../helpers/setup-application';
 import OrderDetailsPage from '../../interactors/order-details-page';
+import { TIMEOUT } from '../../interactors/const';
 
 describe('Approve order is required', function () {
   setupApplication();
 
+  this.timeout(TIMEOUT);
   const orderDetailsPage = new OrderDetailsPage();
 
   beforeEach(async function () {
@@ -36,7 +38,7 @@ describe('Approve order is required', function () {
     await orderDetailsPage.whenLoaded();
   });
 
-  it('approve button should be visible ', () => {
+  it('approve button should be visible', () => {
     expect(orderDetailsPage.approveOrderButton.isPresent).to.be.true;
   });
 });

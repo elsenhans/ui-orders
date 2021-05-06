@@ -24,10 +24,29 @@ import {
   EXPORT_ORDER_FIELDS_OPTIONS,
 } from './constants';
 
+const MODAL_CONFIG_DEFAULT = {
+  actionLabel: <FormattedMessage id="ui-orders.exportSettings.export" />,
+  lineDataOptions: EXPORT_LINE_FIELDS_OPTIONS,
+  lineFieldsLabel: <FormattedMessage id="ui-orders.exportSettings.lineFieldsLabel" />,
+  message: <FormattedMessage id="ui-orders.exportSettings.message" />,
+  modalLabel: <FormattedMessage id="ui-orders.exportSettings.label" />,
+  orderDataOptions: EXPORT_ORDER_FIELDS_OPTIONS,
+  orderFieldsLabel: <FormattedMessage id="ui-orders.exportSettings.orderFieldsLabel" />,
+};
+
 const ExportSettingsModal = ({
   onCancel,
   isExporting,
   onExportCSV,
+  modalConfig: {
+    actionLabel,
+    lineDataOptions,
+    lineFieldsLabel,
+    message,
+    modalLabel,
+    orderDataOptions,
+    orderFieldsLabel,
+  },
 }) => {
   const intl = useIntl();
   const [isOrderExportAll, setIsOrderExportAll] = useState(true);
@@ -57,10 +76,14 @@ const ExportSettingsModal = ({
         buttonStyle="primary"
         onClick={onExport}
         disabled={isExportBtnDisabled}
+        marginBottom0
       >
-        <FormattedMessage id="ui-orders.exportSettings.export" />
+        {actionLabel}
       </Button>
-      <Button onClick={onCancel}>
+      <Button
+        marginBottom0
+        onClick={onCancel}
+      >
         <FormattedMessage id="ui-orders.exportSettings.cancel" />
       </Button>
     </ModalFooter>
@@ -69,18 +92,18 @@ const ExportSettingsModal = ({
   return (
     <Modal
       open
-      label={<FormattedMessage id="ui-orders.exportSettings.label" />}
+      label={modalLabel}
       footer={exportModalFooter}
     >
 
-      <p><FormattedMessage id="ui-orders.exportSettings.message" /></p>
+      <p>{message}</p>
 
       {isExporting
         ? <Loading size="large" />
         : (
           <>
             <Label>
-              <FormattedMessage id="ui-orders.exportSettings.orderFieldsLabel" />
+              {orderFieldsLabel}
             </Label>
 
             <Layout
@@ -111,7 +134,7 @@ const ExportSettingsModal = ({
                   <FormattedMessage id="ui-orders.exportSettings.all" />
                 </Label>
                 <MultiSelection
-                  dataOptions={EXPORT_ORDER_FIELDS_OPTIONS}
+                  dataOptions={orderDataOptions}
                   onChange={setOrderFieldsToExport}
                   value={orderFieldsToExport}
                   disabled={isOrderExportAll}
@@ -120,7 +143,7 @@ const ExportSettingsModal = ({
             </Layout>
 
             <Label>
-              <FormattedMessage id="ui-orders.exportSettings.lineFieldsLabel" />
+              {lineFieldsLabel}
             </Label>
 
             <Layout
@@ -151,7 +174,7 @@ const ExportSettingsModal = ({
                   <FormattedMessage id="ui-orders.exportSettings.all" />
                 </Label>
                 <MultiSelection
-                  dataOptions={EXPORT_LINE_FIELDS_OPTIONS}
+                  dataOptions={lineDataOptions}
                   onChange={setLineFieldsToExport}
                   value={lineFieldsToExport}
                   disabled={isLineExportAll}
@@ -169,6 +192,11 @@ ExportSettingsModal.propTypes = {
   onCancel: PropTypes.func.isRequired,
   isExporting: PropTypes.bool.isRequired,
   onExportCSV: PropTypes.func.isRequired,
+  modalConfig: PropTypes.object,
+};
+
+ExportSettingsModal.defaultProps = {
+  modalConfig: MODAL_CONFIG_DEFAULT,
 };
 
 export default ExportSettingsModal;

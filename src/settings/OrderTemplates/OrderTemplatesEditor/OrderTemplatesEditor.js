@@ -170,8 +170,8 @@ class OrderTemplatesEditor extends Component {
     const currency = formValues?.cost?.currency || stripes.currency;
     const fundDistribution = formValues.fundDistribution || [];
     const vendor = vendors?.find(v => v.id === formValues.vendor);
-    const accounts = vendor?.accounts.map(({ accountNo }) => ({
-      label: accountNo,
+    const accounts = vendor?.accounts.map(({ name, accountNo }) => ({
+      label: `${name} (${accountNo})`,
       value: accountNo,
     }));
 

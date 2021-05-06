@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import SafeHTMLMessage from '@folio/react-intl-safe-html';
+import { FormattedMessage } from 'react-intl';
 
 import { LoadingPane } from '@folio/stripes/components';
 import {
@@ -15,6 +15,7 @@ import {
   useShowCallout,
 } from '@folio/stripes-acq-components';
 
+import { useOrder } from '../../common/hooks/useOrder';
 import {
   CONTRIBUTOR_NAME_TYPES,
   FUND,
@@ -34,35 +35,30 @@ function POLine({
 }) {
   const sendCallout = useShowCallout();
   const [isTagsPaneOpened, toggleTagsPane] = useModalToggle();
-  const [order, setOrder] = useState();
+  const { isLoading: isLoadingOrder, order } = useOrder(orderId);
   const [line, setLine] = useState();
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchOrder = useCallback(
-    () => Promise.all([
-      mutator.lineOrder.GET({ params: { query: `id==${orderId}` } }),
-      mutator.poLine.GET({ params: { query: `id==${lineId}` } })
-        .catch(() => {
-          sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.errors.orderLinesNotLoaded" />,
-            type: 'error',
-          });
+  const fetchOrderLine = useCallback(
+    () => mutator.poLine.GET({ params: { query: `id==${lineId}` } })
+      .catch(() => {
+        sendCallout({
+          message: <FormattedMessage id="ui-orders.errors.orderLinesNotLoaded" />,
+          type: 'error',
+        });
 
-          return [];
-        }),
-    ])
-      .then(([fetchedOrders, lines]) => {
-        setOrder(fetchedOrders[0]);
+        return [];
+      })
+      .then((lines) => {
         setLine(lines?.[0]);
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [lineId, sendCallout],
   );
 
   useEffect(
     () => {
       setIsLoading(true);
-      fetchOrder().finally(setIsLoading);
+      fetchOrderLine().finally(setIsLoading);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [orderId],
@@ -76,7 +72,7 @@ function POLine({
       mutator.poLine.DELETE(line, { silent: true })
         .then(() => {
           sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.line.delete.success" values={{ lineNumber }} />,
+            message: <FormattedMessage id="ui-orders.line.delete.success" values={{ lineNumber }} />,
             type: 'success',
           });
 
@@ -88,7 +84,7 @@ function POLine({
         .catch(async errorResponse => {
           setIsLoading();
           sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.errors.lineWasNotDeleted" />,
+            message: <FormattedMessage id="ui-orders.errors.lineWasNotDeleted" />,
             type: 'error',
           });
 
@@ -98,7 +94,7 @@ function POLine({
             const response = await errorResponse.json();
 
             message = response.errors[0].message;
-          // eslint-disable-next-line no-empty
+            // eslint-disable-next-line no-empty
           } catch (e) {}
 
           if (message) {
@@ -126,13 +122,14 @@ function POLine({
 
   const updatePOLineCB = useCallback(async (poLineWithTags) => {
     await mutator.poLine.PUT(poLineWithTags);
-    await fetchOrder();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetchOrder]);
+    await fetchOrderLine();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchOrderLine]);
 
-  if (isLoading || line?.id !== lineId) {
+  if (isLoading || isLoadingOrder || line?.id !== lineId) {
     return (
       <LoadingPane
+        id="order-lines-details"
         defaultWidth="fill"
         dismissible
         onClose={backToOrder}

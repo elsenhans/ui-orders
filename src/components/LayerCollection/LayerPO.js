@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import SafeHTMLMessage from '@folio/react-intl-safe-html';
+import { FormattedMessage } from 'react-intl';
 
 import { LoadingView } from '@folio/stripes/components';
 import {
@@ -79,7 +79,7 @@ function LayerPO({
     return createOrEditOrderResource(values, memoizedMutator.order)
       .then(savedOrder => {
         sendCallout({
-          message: <SafeHTMLMessage id="ui-orders.order.save.success" values={{ orderNumber: savedOrder.poNumber }} />,
+          message: <FormattedMessage id="ui-orders.order.save.success" values={{ orderNumber: savedOrder.poNumber }} />,
         });
         history.push({
           pathname: `/orders/view/${savedOrder.id}`,

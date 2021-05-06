@@ -171,7 +171,7 @@
     "line.accordion.itemDetails": "Detalles del ítem",
     "line.accordion.physical": "Detalles del recurso físico",
     "line.accordion.vendor": "Proveedor",
-    "line.paneTitle.details": "Detalles",
+    "line.paneTitle.details": "PO Line details - {poLineNumber}",
     "line.paneTitle.edit": "Editar - {lineNumber}",
     "line.paneTitle.new": "Añadir línea de pedido",
     "orderDetails.orderNumberPrefix": "Prefijo",
@@ -666,5 +666,7 @@
     "permission.settings.view": "Settings (Orders): Can view all settings",
     "vendor.referenceNumbers": "Vendor reference numbers",
     "lineListing.refNumber": "Vendor reference number",
-    "search.vendorDetail.referenceNumbers": "Vendor reference number"
+    "search.vendorDetail.referenceNumbers": "Vendor reference number",
+    "payment_status.ongoing": "Ongoing",
+    "receipt_status.ongoing": "Ongoing"
 }

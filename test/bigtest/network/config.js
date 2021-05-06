@@ -96,4 +96,5 @@ export default function config() {
     }));
   });
   this.get(AGREEMENT_LINES_API, createGetAll('agreementLines'));
+  this.get('/finance/exchange-rate');
 }

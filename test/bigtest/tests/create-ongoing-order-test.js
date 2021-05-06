@@ -3,6 +3,7 @@ import { expect } from 'chai';
 
 import { ORDER_TYPE } from '../../../src/common/constants';
 import setupApplication from '../helpers/setup-application';
+import { TIMEOUT } from '../interactors/const';
 import OrderDetailsPage from '../interactors/order-details-page';
 import OrderEditPage from '../interactors/order-edit-page';
 
@@ -10,6 +11,8 @@ describe('Create ongoing order', function () {
   setupApplication();
   const form = new OrderEditPage();
   const orderDetailsPage = new OrderDetailsPage();
+
+  this.timeout(TIMEOUT);
 
   beforeEach(async function () {
     this.visit('/orders/create');

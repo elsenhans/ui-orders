@@ -128,7 +128,14 @@ const OrderLineDetails = ({
   );
 
   if (isLoading || line?.id !== lineId) {
-    return <LoadingPane defaultWidth="fill" dismissible onClose={onClose} />;
+    return (
+      <LoadingPane
+        id="order-lines-details"
+        defaultWidth="fill"
+        dismissible
+        onClose={onClose}
+      />
+    );
   }
 
   return (

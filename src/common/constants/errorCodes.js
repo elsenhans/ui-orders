@@ -51,6 +51,8 @@ export const ERROR_CODES = {
   poNumberNotUnique: 'poNumberNotUnique',
   poNumberRequired: 'poNumberRequired',
   protectedFieldChanging: 'protectedFieldChanging',
+  renewalDateIsNotSet: 'renewalDateIsNotSet',
+  renewalIntervalIsNotSet: 'renewalIntervalIsNotSet',
   userHasNoAcqUnitsPermission: 'userHasNoAcqUnitsPermission',
   userHasNoApprovalPermission: 'userHasNoApprovalPermission',
   userHasNoPermission: 'userHasNoPermission',

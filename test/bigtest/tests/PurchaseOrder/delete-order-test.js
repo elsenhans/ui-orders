@@ -5,10 +5,12 @@ import setupApplication from '../../helpers/setup-application';
 import OrderDetailsPage from '../../interactors/order-details-page';
 import OrderEditPage from '../../interactors/order-edit-page';
 import ConfirmationModal from '../../interactors/confirmation';
+import { TIMEOUT } from '../../interactors/const';
 
 describe('Delete Order', function () {
   setupApplication();
 
+  this.timeout(TIMEOUT);
   const page = new OrderDetailsPage();
   const editOrderPage = new OrderEditPage();
   let order = null;

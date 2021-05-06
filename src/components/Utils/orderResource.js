@@ -53,7 +53,10 @@ export const cloneOrder = async (order, mutator, orderNumberMutator, lines) => {
   const clonedOrder = {
     ...omit(
       order,
-      ['id', 'adjustment', 'metadata', 'poNumber', 'workflowStatus', 'compositePoLines'],
+      [
+        'id', 'adjustment', 'metadata', 'poNumber', 'workflowStatus',
+        'compositePoLines', 'approved', 'approvedById', 'approvalDate',
+      ],
     ),
     poNumber,
   };

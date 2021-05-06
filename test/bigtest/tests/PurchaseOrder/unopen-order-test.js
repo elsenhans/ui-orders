@@ -6,10 +6,12 @@ import { ORDER_STATUSES } from '@folio/stripes-acq-components';
 import setupApplication from '../../helpers/setup-application';
 import OrderDetailsPage from '../../interactors/order-details-page';
 import ConfirmationModal from '../../interactors/confirmation';
+import { TIMEOUT } from '../../interactors/const';
 
 describe('Unopen order', function () {
   setupApplication();
 
+  this.timeout(TIMEOUT);
   const page = new OrderDetailsPage();
 
   beforeEach(async function () {

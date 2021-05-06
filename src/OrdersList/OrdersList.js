@@ -9,8 +9,12 @@ import ReactRouterPropTypes from 'react-router-prop-types';
 
 import {
   MultiColumnList,
-  Paneset,
 } from '@folio/stripes/components';
+import {
+  ColumnManagerMenu,
+  PersistedPaneset,
+  useColumnManager,
+} from '@folio/stripes/smart-components';
 import {
   FiltersPane,
   FolioFormattedDate,
@@ -18,9 +22,9 @@ import {
   ResetButton,
   ResultsPane,
   SingleSearchForm,
+  useFiltersToogle,
   useLocalStorageFilters,
   useLocationSorting,
-  useToggle,
   ORDER_STATUS_LABEL,
   useModalToggle,
 } from '@folio/stripes-acq-components';
@@ -37,7 +41,6 @@ import OrderExportSettingsModalContainer from './OrderExportSettingsModalContain
 
 const UPDATED_DATE = 'metadata.updatedDate';
 const title = <FormattedMessage id="ui-orders.navigation.orders" />;
-const visibleColumns = ['poNumber', 'vendorCode', 'workflowStatus', 'orderType', UPDATED_DATE, 'acquisitionsUnit', 'assignedTo'];
 const sortableColumns = ['poNumber', 'workflowStatus', 'orderType', UPDATED_DATE];
 const resultsFormatter = {
   [UPDATED_DATE]: order => <FolioFormattedDate value={order.metadata?.updatedDate} />,
@@ -80,9 +83,10 @@ function OrdersList({
     sortingDirection,
     changeSorting,
   ] = useLocationSorting(location, history, resetData, sortableColumns);
-  const [isFiltersOpened, toggleFilters] = useToggle(true);
+  const { isFiltersOpened, toggleFilters } = useFiltersToogle('ui-orders/orders/filters');
   const [isExportModalOpened, toggleExportModal] = useModalToggle();
   const searchableIndexes = useSearchableIndexes();
+  const { visibleColumns, toggleColumn } = useColumnManager('orders-column-manager', columnMapping);
 
   const selectOrder = useCallback(
     (e, { id }) => {
@@ -104,20 +108,35 @@ function OrdersList({
   );
   const renderActionMenu = useCallback(
     ({ onToggle }) => (
-      <OrdersListActionMenu
-        ordersCount={ordersCount}
-        search={location.search}
-        onToggle={onToggle}
-        toggleExportModal={toggleExportModal}
-      />
+      <>
+        <OrdersListActionMenu
+          ordersCount={ordersCount}
+          search={location.search}
+          onToggle={onToggle}
+          toggleExportModal={toggleExportModal}
+        />
+        <ColumnManagerMenu
+          prefix="orders"
+          columnMapping={columnMapping}
+          visibleColumns={visibleColumns}
+          toggleColumn={toggleColumn}
+        />
+      </>
     ),
-    [location.search, ordersCount, toggleExportModal],
+    [location.search, ordersCount, toggleExportModal, visibleColumns, toggleColumn],
   );
 
   return (
-    <Paneset data-test-order-instances>
+    <PersistedPaneset
+      appId="ui-orders"
+      id="orders"
+      data-test-order-instances
+    >
       {isFiltersOpened && (
-        <FiltersPane toggleFilters={toggleFilters}>
+        <FiltersPane
+          id="orders-filters-pane"
+          toggleFilters={toggleFilters}
+        >
           <OrdersNavigation isOrders />
           <SingleSearchForm
             applySearch={applySearch}
@@ -144,6 +163,7 @@ function OrdersList({
       )}
 
       <ResultsPane
+        id="orders-results-pane"
         count={ordersCount}
         renderActionMenu={renderActionMenu}
         title={title}
@@ -189,7 +209,7 @@ function OrdersList({
           />
         )}
       />
-    </Paneset>
+    </PersistedPaneset>
   );
 }
 

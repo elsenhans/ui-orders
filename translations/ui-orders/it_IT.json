@@ -593,7 +593,7 @@
     "itemDetails.linkPackage": "Linked package",
     "itemDetails.linkPackageLookUp": "Lookup package POL",
     "find-po-line-plugin-unavailable": "Find PO line plugin is not available",
-    "deletePiece.btn.cancel": "Cancel",
+    "deletePiece.btn.cancel": "Annulla",
     "deletePiece.btn.deletePiece": "Delete",
     "deletePiece.title": "Piece(s) to be deleted",
     "deletePiece.warning": "The selected piece(s) and its' linked item record(s) in inventory will be PERMANENTLY DELETED. You can NOT delete items that have open requests.",
@@ -616,7 +616,7 @@
     "line.accordion.linkedAgreementLines": "Linked agreement lines",
     "errors.incorrectFundDistributionTotal": "Fund distribution total must add to 100% or totalPrice",
     "errors.piecesNeedToBeCreated": "Pieces need to be created",
-    "cost.discountType": "Type",
+    "cost.discountType": "Tipo",
     "validation.year": "Field should be 4-digit year",
     "permission.order.view": "Orders: View orders",
     "permission.order.create": "Orders: Create orders",
@@ -666,5 +666,7 @@
     "permission.settings.view": "Settings (Orders): Can view all settings",
     "vendor.referenceNumbers": "Vendor reference numbers",
     "lineListing.refNumber": "Vendor reference number",
-    "search.vendorDetail.referenceNumbers": "Vendor reference number"
+    "search.vendorDetail.referenceNumbers": "Vendor reference number",
+    "payment_status.ongoing": "Ongoing",
+    "receipt_status.ongoing": "Ongoing"
 }

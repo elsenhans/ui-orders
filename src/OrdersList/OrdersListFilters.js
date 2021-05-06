@@ -153,10 +153,18 @@ function OrdersListFilters({ activeFilters, closingReasons, applyFilters, disabl
         onChange={onChange}
         disabled={disabled}
       />
+      <BooleanFilter
+        id={FILTERS.SUBSCRIPTION}
+        activeFilters={activeFilters[FILTERS.SUBSCRIPTION]}
+        labelId="ui-orders.renewals.subscription"
+        name={FILTERS.SUBSCRIPTION}
+        onChange={onChange}
+        disabled={disabled}
+      />
       <AcqDateRangeFilter
         id={FILTERS.RENEWAL_DATE}
         activeFilters={activeFilters[FILTERS.RENEWAL_DATE]}
-        labelId="ui-orders.renewal.date"
+        labelId="ui-orders.renewals.renewalDate"
         name={FILTERS.RENEWAL_DATE}
         onChange={onChange}
         disabled={disabled}
@@ -164,7 +172,7 @@ function OrdersListFilters({ activeFilters, closingReasons, applyFilters, disabl
       <BooleanFilter
         id={FILTERS.MANUAL_RENEWAL}
         activeFilters={activeFilters[FILTERS.MANUAL_RENEWAL]}
-        labelId="ui-orders.renewal.manualRenewal"
+        labelId="ui-orders.renewals.manualRenewal"
         name={FILTERS.MANUAL_RENEWAL}
         onChange={onChange}
         disabled={disabled}
@@ -172,7 +180,7 @@ function OrdersListFilters({ activeFilters, closingReasons, applyFilters, disabl
       <OrdersTextFilter
         id="order-reviewPeriod"
         activeFilters={activeFilters[FILTERS.RENEWAL_REVIEW_PERIOD]}
-        labelId="ui-orders.renewal.reviewPeriod"
+        labelId="ui-orders.renewals.reviewPeriod"
         name={FILTERS.RENEWAL_REVIEW_PERIOD}
         type="number"
         onChange={onChange}

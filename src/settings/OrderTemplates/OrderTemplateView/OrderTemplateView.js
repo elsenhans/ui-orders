@@ -264,7 +264,10 @@ class OrderTemplateView extends Component {
                   label={ORDER_TEMPLATES_ACCORDION_TITLES[ORDER_TEMPLATES_ACCORDION.POL_VENDOR]}
                   id={ORDER_TEMPLATES_ACCORDION.POL_VENDOR}
                 >
-                  <VendorView vendorDetail={orderTemplate.vendorDetail} />
+                  <VendorView
+                    vendorDetail={orderTemplate.vendorDetail}
+                    vendorId={orderTemplate.vendor}
+                  />
                 </Accordion>
 
                 <Accordion

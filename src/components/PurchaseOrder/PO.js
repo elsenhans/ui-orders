@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import PropTypes from 'prop-types';
 import ReactRouterPropTypes from 'react-router-prop-types';
-import SafeHTMLMessage from '@folio/react-intl-safe-html';
 import { get } from 'lodash';
+import { useReactToPrint } from 'react-to-print';
 
 import {
   IfPermission,
@@ -14,6 +14,7 @@ import {
   LIMIT_MAX,
   Tags,
   TagsBadge,
+  useAcqRestrictions,
   useModalToggle,
   useShowCallout,
 } from '@folio/stripes-acq-components';
@@ -30,6 +31,7 @@ import {
   Row,
 } from '@folio/stripes/components';
 
+import { PrintSettingsModalContainer } from '../../common/ExportSettingsModal';
 import {
   getAddresses,
 } from '../../common/utils';
@@ -40,6 +42,10 @@ import {
   reasonsForClosureResource,
   updateEncumbrancesResource,
 } from '../../common/resources';
+import {
+  hydrateOrderToPrint,
+  PrintContent,
+} from '../../PrintOrder';
 import {
   ADDRESSES,
   APPROVALS_SETTING,
@@ -103,7 +109,7 @@ const PO = ({
           const errorKey = isGeneralError ? 'orderNotLoaded' : 'conversionError';
 
           sendCallout({
-            message: <SafeHTMLMessage id={`ui-orders.errors.${errorKey}`} />,
+            message: <FormattedMessage id={`ui-orders.errors.${errorKey}`} />,
             type: 'error',
           });
 
@@ -124,7 +130,7 @@ const PO = ({
       })
         .catch(() => {
           sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.errors.orderLinesNotLoaded" />,
+            message: <FormattedMessage id="ui-orders.errors.orderLinesNotLoaded" />,
             type: 'error',
           });
 
@@ -134,7 +140,7 @@ const PO = ({
     ])
       .then(([orderResp, orderInvoicesResp, compositePoLines, orderListResp]) => {
         setOrder({
-          ...orderListResp[0],
+          ...(orderListResp[0] || {}),
           compositePoLines,
           ...orderResp,
         });
@@ -163,6 +169,7 @@ const PO = ({
   const [isOpenOrderModalOpened, toggleOpenOrderModal] = useModalToggle();
   const [isUnopenOrderModalOpened, toggleUnopenOrderModal] = useModalToggle();
   const [isDeletePiecesOpened, toggleDeletePieces] = useModalToggle();
+  const [isPrintModalOpened, togglePrintModal] = useModalToggle();
   const reasonsForClosure = get(resources, 'closingReasons.records');
   const orderNumber = get(order, 'poNumber', '');
   const poLines = order?.compositePoLines;
@@ -187,7 +194,7 @@ const PO = ({
       cloneOrder(order, mutator.orderDetails, mutator.generatedOrderNumber, poLines)
         .then(newOrder => {
           sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.order.clone.success" />,
+            message: <FormattedMessage id="ui-orders.order.clone.success" />,
             type: 'success',
           });
           history.push({
@@ -222,7 +229,7 @@ const PO = ({
       mutator.orderDetails.DELETE(order, { silent: true })
         .then(() => {
           sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.order.delete.success" values={{ orderNumber }} />,
+            message: <FormattedMessage id="ui-orders.order.delete.success" values={{ orderNumber }} />,
             type: 'success',
           });
           refreshList();
@@ -233,7 +240,7 @@ const PO = ({
         })
         .catch(() => {
           sendCallout({
-            message: <SafeHTMLMessage id="ui-orders.errors.orderWasNotDeleted" />,
+            message: <FormattedMessage id="ui-orders.errors.orderWasNotDeleted" />,
             type: 'error',
           });
           setIsLoading();
@@ -258,7 +265,7 @@ const PO = ({
       updateOrderResource(order, mutator.orderDetails, closeOrderProps)
         .then(
           () => {
-            sendCallout({ message: <SafeHTMLMessage id="ui-orders.closeOrder.success" /> });
+            sendCallout({ message: <FormattedMessage id="ui-orders.closeOrder.success" /> });
             refreshList();
 
             return fetchOrder();
@@ -280,7 +287,7 @@ const PO = ({
         .then(
           () => {
             sendCallout({
-              message: <SafeHTMLMessage id="ui-orders.order.approved.success" values={{ orderNumber }} />,
+              message: <FormattedMessage id="ui-orders.order.approved.success" values={{ orderNumber }} />,
             });
             refreshList();
 
@@ -308,7 +315,7 @@ const PO = ({
         .then(
           () => {
             sendCallout({
-              message: <SafeHTMLMessage id="ui-orders.order.open.success" values={{ orderNumber: order?.poNumber }} />,
+              message: <FormattedMessage id="ui-orders.order.open.success" values={{ orderNumber: order?.poNumber }} />,
               type: 'success',
             });
             refreshList();
@@ -344,7 +351,7 @@ const PO = ({
         .then(
           () => {
             sendCallout({
-              message: <SafeHTMLMessage id="ui-orders.order.reopen.success" values={{ orderNumber }} />,
+              message: <FormattedMessage id="ui-orders.order.reopen.success" values={{ orderNumber }} />,
               type: 'success',
             });
             refreshList();
@@ -373,7 +380,7 @@ const PO = ({
         .then(
           () => {
             sendCallout({
-              message: <SafeHTMLMessage id="ui-orders.order.unopen.success" values={{ orderNumber }} />,
+              message: <FormattedMessage id="ui-orders.order.unopen.success" values={{ orderNumber }} />,
               type: 'success',
             });
             refreshList();
@@ -489,7 +496,7 @@ const PO = ({
       mutator.updateEncumbrances.POST({})
         .then(
           () => {
-            sendCallout({ message: <SafeHTMLMessage id="ui-orders.order.updateEncumbrances.success" /> });
+            sendCallout({ message: <FormattedMessage id="ui-orders.order.updateEncumbrances.success" /> });
 
             return fetchOrder();
           },
@@ -503,9 +510,32 @@ const PO = ({
     [fetchOrder, handleErrorResponse, orderErrorModalShow, sendCallout],
   );
 
+  const componentRef = useRef();
+  const handlePrint = useReactToPrint({
+    content: () => componentRef.current,
+  });
+  const [orderToPrint, setOrderToPrint] = useState();
+  const printOrderModal = (exportData) => {
+    setOrderToPrint(exportData);
+    handlePrint();
+  };
+
+  const hydratedOrderToPrint = useMemo(() => {
+    return hydrateOrderToPrint({ order: orderToPrint });
+  }, [orderToPrint]);
+
+  const { restrictions, isLoading: isRestrictionsLoading } = useAcqRestrictions(
+    order?.id, order?.acqUnitIds,
+  );
+
   if (isLoading || order?.id !== match.params.id) {
     return (
-      <LoadingPane dismissible defaultWidth="fill" onClose={gotToOrdersList} />
+      <LoadingPane
+        id="order-details"
+        dismissible
+        defaultWidth="fill"
+        onClose={gotToOrdersList}
+      />
     );
   }
 
@@ -516,6 +546,7 @@ const PO = ({
 
   const POPane = (
     <Pane
+      id="order-details"
       actionMenu={getPOActionMenu({
         approvalsSetting,
         clickApprove: approveOrder,
@@ -528,7 +559,10 @@ const PO = ({
         clickReopen: reopenOrder,
         clickUnopen: toggleUnopenOrderModal,
         clickUpdateEncumbrances: updateEncumbrances,
+        handlePrint: togglePrintModal,
+        isRestrictionsLoading,
         order,
+        restrictions,
       })}
       data-test-order-details
       defaultWidth="fill"
@@ -653,6 +687,17 @@ const PO = ({
           poLines={poLines}
         />
       )}
+      {isPrintModalOpened && (
+        <PrintSettingsModalContainer
+          onCancel={togglePrintModal}
+          printOrder={printOrderModal}
+          orderToPrint={order}
+        />
+      )}
+      <PrintContent
+        ref={componentRef}
+        dataSource={hydratedOrderToPrint}
+      />
     </Pane>
   );
 
