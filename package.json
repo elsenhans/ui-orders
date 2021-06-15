@@ -369,7 +369,9 @@
     "test": "yarn run test:unit && yarn run test:e2e",
     "test:unit": "jest --ci --coverage",
     "test:e2e": "yarn stripes test karma --karma.singleRun --karma.browsers ChromeDocker --karma.reporters mocha junit --coverage",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build-mod-descriptor": "stripes mod descriptor --full --strict | jq '.[]' > module-descriptor.json"
+    
   },
   "devDependencies": {
     "@babel/core": "^7.8.0",
