@@ -160,7 +160,7 @@ jobs:
           always-auth: true
 
       - name: Set _auth in .npmrc
-        if: ${{ github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' || || github.ref == 'refs/heads/FOLIO-2913' }}
+        if: ${{ github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' || github.ref == 'refs/heads/FOLIO-2913' }}
         run: npm config set @folio:registry https://repository.folio.org/repository/npm-folioci-test/ &&  npm config set _auth ${{ env.NODE_AUTH_TOKEN }}
         env: 
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
