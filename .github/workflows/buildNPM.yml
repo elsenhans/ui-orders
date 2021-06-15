@@ -5,8 +5,10 @@
 # https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
 # Common FOLIO configurable env:
-#   - YARN_TEST_OPTIONS
-#   - SQ_ROOT_DIR
+#   - YARN_TEST_OPTIONS (options to pass to 'yarn test')
+#   - SQ_ROOT_DIR (where to scan relative to top-level directory)
+#   - FOLIO_NAME
+#   - PUBLISH_MOD_DESCRIPTOR (boolean 'true' or 'false')
 
 
 name: buildNPM Snapshot
@@ -22,12 +24,14 @@ jobs:
   Build:
     env:
       YARN_TEST_OPTIONS: ''
+      FOLIO_NAME: folio_orders
       FOLIO_NPM_REGISTRY: 'https://repository.folio.org/repository/npm-folioci/'
       NODEJS_VERSION: '12'
       JEST_JUNIT_OUTPUT_DIR: 'artifacts/jest-junit'
       JEST_COVERAGE_REPORT_DIR: 'artifacts/coverage-jest/lcov-report/'
       BIGTEST_JUNIT_OUTPUT_DIR: 'artifacts/runTest'
       BIGTEST_COVERAGE_REPORT_DIR: 'artifacts/coverage/lcov-report/'
+      PUBLISH_MOD_DESCRIPTOR: true
       SQ_ROOT_DIR: './src'
       SQ_LCOV_REPORT: 'artifacts/coverage-jest/lcov.info'
       SQ_EXCLUSIONS: '**/platform/alias-service.js,**/docs/**,**/node_modules/**,**/examples/**,**/artifacts/**,**/ci/**,Jenkinsfile,**/LICENSE,**/*.css,**/*.md,**/*.json,**/tests/**,**/stories/*.js,**/test/**,**/.stories.js,**/resources/bigtest/interactors/**,**/resources/bigtest/network/**,**/*-test.js,**/*.test.js,**/*-spec.js,**/karma.conf.js,**/jest.config.js'
@@ -37,6 +41,12 @@ jobs:
       - uses: folio-org/checkout@v2
         with:
           fetch-depth: 0
+          
+      - name: Extract Branch Name
+        run: echo "BRANCH=$(echo ${GITHUB_REF##*/})" >> $GITHUB_ENV
+
+      - name: Test BRANCH contents are
+        run: echo ${{ env.BRANCH }} 
 
       - name: Setup kernel for react native, increase watchers
         run: echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
@@ -45,8 +55,10 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
           check-latest: true
+          always-auth: true
 
-      - run: yarn config set @folio:registry $FOLIO_NPM_REGISTRY
+      - name: Set yarn config
+        run: yarn config set @folio:registry $FOLIO_NPM_REGISTRY
 
       - name: Set FOLIO NPM snapshot version
         run: | 
@@ -57,7 +69,7 @@ jobs:
           JOB_ID: ${{ github.run_number }}
 
       - name: Run yarn install
-        run: yarn install
+        run: yarn install --ignore-scripts
 
       - name: Run yarn list
         run: yarn list --pattern @folio
@@ -67,7 +79,15 @@ jobs:
         continue-on-error: true
 
       - name: Run yarn test
-        run: xvfb-run --server-args="-screen 0 1024x768x24" yarn test $YARN_TEST_OPTIONS 
+        run: xvfb-run --server-args="-screen 0 1024x768x24" yarn test $YARN_TEST_OPTIONS
+
+      - name: Generate Module descriptor
+        if: ${{ env.PUBLISH_MOD_DESCRIPTOR }}
+        run: yarn build-mod-descriptor
+
+      - name: debug mod descriptor
+        if: ${{ env.PUBLISH_MOD_DESCRIPTOR }}
+        run: cat module-descriptor.json
 
       - name: Publish Jest unit test results
         uses: docker://ghcr.io/enricomi/publish-unit-test-result-action:v1
@@ -116,7 +136,7 @@ jobs:
       - name: Fetch branches for SonarCloud
         run: git fetch --no-tags ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY} +refs/heads/master:refs/remotes/origin/master
         
-      - name: Run SonarCloud scan 
+      - name: Run SonarCloud scan
         uses: sonarsource/sonarcloud-github-action@master
         with:
           args: >
@@ -130,13 +150,47 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Set up NPM environment for publishing
+        if: ${{ github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main'}}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+          check-latest: true
+          always-auth: true
+
+      - name: Set _auth in .npmrc
+        if: ${{ github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' }}
+        run: npm config set @folio:registry https://repository.folio.org/repository/npm-folioci-test/ &&  npm config set _auth ${{ env.NODE_AUTH_TOKEN }}
+        env: 
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish NPM
+        if: ${{ github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       
-      - name: Publish Snapshot Module descriptor
-      - if: github.REF != 'master'
+      - name: Read module descriptor
+        if: ${{ env.PUBLISH_MOD_DESCRIPTOR && github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' }}
+        id: moduleDescriptor
+        uses: juliangruber/read-file-action@v1
+        with: 
+          path: ./module-descriptor.json
+
+      - name: Publish module descriptor
+        if: ${{ env.PUBLISH_MOD_DESCRIPTOR && github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' }} 
+        id: modDescriptorPost
         uses: fjogeleit/http-request-action@master
         with:
-          url: 'http://ec2-3-88-110-24.compute-1.amazonaws.com'
+          url: 'http://ec2-3-88-110-24.compute-1.amazonaws.com/_/proxy/modules'
           method: 'POST'
+          contentType: 'application/json; charset=utf-8'
+          customHeaders: '{ "Accept": "application/json; charset=utf-8" }'
+          data: ${{ steps.moduleDescriptor.outputs.content }}
           username: ${{ secrets.FOLIO_REGISTRY_USERNAME }}
-          password: ${{  secrets.FOLIO_REGISTRY_PASSWORD }}
-      - run: echo 'Publish mod descriptor step'
+          password: ${{ secrets.FOLIO_REGISTRY_PASSWORD }}
+
+      - name: Show FOLIO registry response
+        if: ${{ env.PUBLISH_MOD_DESCRIPTOR && github.ref == 'refs/heads/master' || github.ref  == 'refs/heads/main' }} 
+        run: echo "${{ steps.modDescriptorPost.outputs.response }}"
