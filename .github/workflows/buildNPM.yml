@@ -9,17 +9,12 @@
 #   - SQ_ROOT_DIR (where to scan relative to top-level directory)
 #   - FOLIO_NAME
 #   - PUBLISH_MOD_DESCRIPTOR (boolean 'true' or 'false')
+#   - COMPILE_TRANSLATION_FILES (boolean 'true' or 'false')
 
 
 name: buildNPM Snapshot
-on: 
-  push:
-    paths-ignore:
-      - 'translations/**'
-  pull_request:
-     paths-ignore:
-      - 'translations/**'
-
+on: [push, pull_request]
+   
 jobs:
   Build:
     env:
@@ -32,6 +27,7 @@ jobs:
       BIGTEST_JUNIT_OUTPUT_DIR: 'artifacts/runTest'
       BIGTEST_COVERAGE_REPORT_DIR: 'artifacts/coverage/lcov-report/'
       PUBLISH_MOD_DESCRIPTOR: true
+      COMPILE_TRANSLATION_FILES: true
       SQ_ROOT_DIR: './src'
       SQ_LCOV_REPORT: 'artifacts/coverage-jest/lcov.info'
       SQ_EXCLUSIONS: '**/platform/alias-service.js,**/docs/**,**/node_modules/**,**/examples/**,**/artifacts/**,**/ci/**,Jenkinsfile,**/LICENSE,**/*.css,**/*.md,**/*.json,**/tests/**,**/stories/*.js,**/test/**,**/.stories.js,**/resources/bigtest/interactors/**,**/resources/bigtest/network/**,**/*-test.js,**/*.test.js,**/*-spec.js,**/karma.conf.js,**/jest.config.js'
@@ -80,6 +76,10 @@ jobs:
 
 #       - name: Run yarn test
 #         run: xvfb-run --server-args="-screen 0 1024x768x24" yarn test $YARN_TEST_OPTIONS
+
+      - name: Run yarn formatjs-compile
+        if : ${{ env.COMPILE_TRANSLATION_FILES }}
+        run: yarn formatjs-compile
 
       - name: Generate Module descriptor
         if: ${{ env.PUBLISH_MOD_DESCRIPTOR }}
