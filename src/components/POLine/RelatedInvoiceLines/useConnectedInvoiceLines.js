@@ -28,10 +28,10 @@ export const useConnectedInvoiceLines = (orderLineId) => {
   const { isLoading, data = [] } = useQuery(
     [namespace],
     async () => {
-      const { invoiceLines = [] } = await ky.get(INVOICE_LINES_API, {
+      const { invoiceLines = [] } = await ky.get(INVOICE_LINES_API, { searchParams: {
         query: `poLineId==${orderLineId}`,
         limit: LIMIT_MAX,
-      }).json();
+      }}).json();
 
       const invoicesIds = invoiceLines.map(({ invoiceId }) => invoiceId);
       const invoices = await batchRequest(
