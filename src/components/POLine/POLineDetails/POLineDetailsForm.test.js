@@ -108,4 +108,32 @@ describe('POLineDetailsForm', () => {
     expect(claimingActiveField).not.toBeChecked();
     expect(claimingIntervalField).toHaveValue(null);
   });
+
+  it('should validate \'Claiming interval\' field', async () => {
+    renderPOLineDetailsForm(null, { claimingActive: false });
+
+    const claimingActiveField = screen.getByRole('checkbox', { name: 'ui-orders.poLine.claimingActive' });
+    const claimingIntervalField = screen.getByLabelText('ui-orders.poLine.claimingInterval');
+
+    // Shouldn't be required if claimeng active equals "false"
+    expect(claimingIntervalField).not.toBeRequired();
+
+    await userEvent.click(claimingActiveField);
+    expect(claimingIntervalField).toBeRequired();
+    expect(claimingIntervalField).not.toBeValid();
+
+    await userEvent.type(claimingIntervalField, '-1');
+    expect(claimingIntervalField).toHaveValue(-1);
+    expect(claimingIntervalField).not.toBeValid();
+
+    await userEvent.clear(claimingIntervalField);
+    await userEvent.type(claimingIntervalField, '0');
+    expect(claimingIntervalField).toHaveValue(0);
+    expect(claimingIntervalField).not.toBeValid();
+
+    await userEvent.clear(claimingIntervalField);
+    await userEvent.type(claimingIntervalField, '42');
+    expect(claimingIntervalField).toHaveValue(42);
+    expect(claimingIntervalField).toBeValid();
+  });
 });
