@@ -14,7 +14,7 @@ export const FieldClaimingActive = ({ onChange }) => {
       name="claimingActive"
       type="checkbox"
       vertical
-      validateFields={[]}
+      validateFields={['claimingInterval']}
     />
   );
 };

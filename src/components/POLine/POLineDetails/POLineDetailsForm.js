@@ -230,7 +230,10 @@ function POLineDetailsForm({
             xs={6}
             md={3}
           >
-            <FieldClaimingInterval disabled={!isClaimingActive} />
+            <FieldClaimingInterval
+              disabled={!isClaimingActive}
+              required={isClaimingActive}
+            />
           </Col>
         </IfFieldVisible>
       </Row>
