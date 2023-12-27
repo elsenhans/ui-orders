@@ -8,7 +8,9 @@ import {
   validateRequiredPositiveNumber,
 } from '@folio/stripes-acq-components';
 
-const validate = (value) => {
+const validate = (value, { claimingActive }) => {
+  if (!claimingActive) return undefined;
+
   return validateRequired(value) || validateRequiredPositiveNumber(value);
 };
 
@@ -23,7 +25,7 @@ export const FieldClaimingInterval = ({ disabled, required }) => {
       fullWidth
       disabled={disabled}
       required={required}
-      validate={required ? validate : undefined}
+      validate={validate}
       validateFields={[]}
     />
   );
