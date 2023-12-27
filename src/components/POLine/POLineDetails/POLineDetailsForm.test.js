@@ -115,8 +115,9 @@ describe('POLineDetailsForm', () => {
     const claimingActiveField = screen.getByRole('checkbox', { name: 'ui-orders.poLine.claimingActive' });
     const claimingIntervalField = screen.getByLabelText('ui-orders.poLine.claimingInterval');
 
-    // Shouldn't be required if claimeng active equals "false"
+    // Shouldn't be required if "Claiming active" unchecked
     expect(claimingIntervalField).not.toBeRequired();
+    expect(claimingIntervalField).toBeValid();
 
     await userEvent.click(claimingActiveField);
     expect(claimingIntervalField).toBeRequired();
