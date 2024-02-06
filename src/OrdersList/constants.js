@@ -13,6 +13,7 @@ export const FILTERS = {
   BILL_TO: 'billTo',
   CLOSE_REASON: 'closeReason.reason',
   CREATED_BY: 'metadata.createdByUserId',
+  CUSTOM_FIELDS: 'customFields',
   DATE_CREATED: 'metadata.createdDate',
   DATE_ORDERED: 'dateOrdered',
   MANUAL_RENEWAL: 'ongoing.manualRenewal',

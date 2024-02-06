@@ -18,6 +18,7 @@ import PrefixFilter from '@folio/plugin-find-po-line/FindPOLine/PrefixFilter';
 import SuffixFilter from '@folio/plugin-find-po-line/FindPOLine/SuffixFilter';
 
 import ClosingReasonFilter from '../common/ClosingReasonFilter';
+import CustomFieldsFilters from '../common/CustomFieldsFilters/CustomFieldsFilters';
 import AddressFilter from '../common/AddressFilter';
 import {
   closingReasonsShape,
@@ -38,6 +39,12 @@ function OrdersListFilters({ activeFilters, closingReasons, applyFilters, disabl
 
   return (
     <AccordionSet>
+      <CustomFieldsFilters
+        activeFilters={activeFilters}
+        id={'customFields.poMultiSelect'}
+        name={'customFields.poMultiSelect'}
+        onChange={onChange}
+      />
       <AcqCheckboxFilter
         id={FILTERS.STATUS}
         activeFilters={activeFilters[FILTERS.STATUS]}
