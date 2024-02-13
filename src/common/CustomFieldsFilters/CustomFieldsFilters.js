@@ -10,6 +10,8 @@ const CustomFieldsFilters = ({
   ...props
 }) => {
 
+  if (!customFields) return null;
+
   return customFields.map((customField) => (
     <CustomFieldsFilter
       activeFilters={

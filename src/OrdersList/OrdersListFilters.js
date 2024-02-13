@@ -40,7 +40,8 @@ function OrdersListFilters({ activeFilters, closingReasons, customFields, applyF
   return (
     <AccordionSet>
       <CustomFieldsFilters
-        activeFilters={activeFilters[FILTERS.CUSTOM_FIELDS]}
+        // activeFilters={activeFilters[FILTERS.CUSTOM_FIELDS]}
+        activeFilters={activeFilters}
         customFields={customFields}
         id={FILTERS.CUSTOM_FIELDS}
         name={FILTERS.CUSTOM_FIELDS}
