@@ -858,7 +858,7 @@
     "line.accordion.donor": "捐赠者",
     "poLine.claimingActive": "催缺激活",
     "poLine.claimingInterval": "催缺间隔",
-    "poLine.donorOrganizationIds": "Donor information",
-    "settings.customFields.purchaseOrders": "Custom Fields - Purchase Orders",
-    "settings.customFields.purchaseOrderLines": "Custom Fields - Purchase Order Lines"
+    "poLine.donorOrganizationIds": "捐赠者信息",
+    "settings.customFields.purchaseOrders": "自定义字段 - 采购订单",
+    "settings.customFields.purchaseOrderLines": "自定义字段 - 采购订单行"
 }
