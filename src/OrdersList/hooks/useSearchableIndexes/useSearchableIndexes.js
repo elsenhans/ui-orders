@@ -24,5 +24,9 @@ export function useSearchableIndexes() {
       labelId: 'ui-orders.search.poNumber',
       value: 'poNumber',
     },
+    // {
+    //   labelId: 'ui-orders.search.customFields',
+    //   value: 'customFields',
+    // },
   ], [localeDateFormat]);
 }

@@ -1,13 +1,11 @@
-import { memo } from 'react';
 import PropTypes from 'prop-types';
+import { memo } from 'react';
 
+import { FilterAccordion } from '@folio/stripes-acq-components';
 import {
-  MultiSelectionFilter,
   CheckboxFilter,
+  MultiSelectionFilter,
 } from '@folio/stripes/smart-components';
-import {
-  FilterAccordion,
-} from '@folio/stripes-acq-components';
 
 import { FILTERS } from '../../OrdersList/constants';
 
@@ -21,36 +19,32 @@ const customFieldTypeToFilterMap = {
 
 const CustomFieldsFilter = ({
   activeFilters,
+  closeByDefault,
   customField,
+  disabled,
   onChange,
 }) => {
-  const FilterComponent = customFieldTypeToFilterMap[customField.type]; // "MULTI_SELECT_DROPDOWN" -> 'MultiSelectionFilter'
+  const FilterComponent = customFieldTypeToFilterMap[customField.type];
 
   if (!FilterComponent) {
     return null;
   }
 
-  const {
-    refId,
-    name,
-    selectField,
-  } = customField;
+  const { refId, name, selectField } = customField;
 
   const values = selectField?.options?.values ?? [{ id: 'true', value: name }];
   const filterName = `${FILTERS.CUSTOM_FIELDS}.${refId}`;
-  // const filterNameM = `customFields-${refId}`;
-  // const selectedValues = activeFilters?.filterName?  activeFilters[filterName] : [];
-  const dataOptions = values.map(({ id: value, value: label }) => ({ label, value }));
+  const dataOptions = values.map(({ id: value, value: label }) => ({
+    label,
+    value,
+  }));
   const closedByDefault = false;
-
-  // console.log('xxx filterName');
-  // console.log(filterName);
 
   return (
     <FilterAccordion
       activeFilters={activeFilters}
-      // activeFilters={activeFilters[`customFields.${customField.refId}`]}
-      closedByDefault={closedByDefault}
+      closeByDefault={closeByDefault}
+      disabled={disabled}
       id={`orders-filter-accordion-custom-field-${refId}`}
       label={name}
       name={filterName}
@@ -59,8 +53,8 @@ const CustomFieldsFilter = ({
       <FilterComponent
         aria-labelledby={`orders-filter-accordion-custom-field-${refId}`}
         dataOptions={dataOptions}
+        disabled={disabled}
         name={filterName}
-        // selectedValues={selectedValues}
         selectedValues={activeFilters}
         onChange={onChange}
       />
@@ -70,8 +64,15 @@ const CustomFieldsFilter = ({
 
 CustomFieldsFilter.propTypes = {
   customField: PropTypes.object,
+  closeByDefault: PropTypes.bool,
+  disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   activeFilters: PropTypes.arrayOf(PropTypes.string),
+};
+
+CustomFieldsFilter.defaultProps = {
+  closeByDefault: true,
+  disabled: true,
 };
 
 export default memo(CustomFieldsFilter);

@@ -3,7 +3,6 @@ export * from './checkRelatedHoldings';
 export * from './createClearFilterHandler';
 export * from './fieldArray';
 export * from './getAcqUnitsByIds';
-export * from './getCustomFields';
 export * from './getFundOptions';
 export * from './getSettingsList';
 export * from './getAddresses';

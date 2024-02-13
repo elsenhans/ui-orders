@@ -21,6 +21,7 @@ import {
   ColumnManagerMenu,
   PersistedPaneset,
   useColumnManager,
+  useCustomFields,
 } from '@folio/stripes/smart-components';
 import {
   FiltersPane,
@@ -40,7 +41,10 @@ import {
   useItemToView,
 } from '@folio/stripes-acq-components';
 
-import { CANCEL_ORDER_REASON } from '../common/constants';
+import {
+  CANCEL_ORDER_REASON,
+  CUSTOM_FIELDS_BACKEND_MODULE_NAME,
+} from '../common/constants';
 import { useIsRowSelected } from '../common/hooks';
 import OrdersNavigation from '../common/OrdersNavigation';
 import Panes from '../components/Panes';
@@ -129,6 +133,7 @@ function OrdersList({
   const [isExportModalOpened, toggleExportModal] = useModalToggle();
   const searchableIndexes = useSearchableIndexes();
   const { visibleColumns, toggleColumn } = useColumnManager('orders-column-manager', columnMapping);
+  const [customFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
 
   const { itemToView, setItemToView, deleteItemToView } = useItemToView('orders-list');
 
@@ -217,6 +222,7 @@ function OrdersList({
             <OrdersListFiltersContainer
               activeFilters={filters}
               applyFilters={applyFilters}
+              customFields={customFields}
               disabled={isLoading}
             />
           </FiltersPane>

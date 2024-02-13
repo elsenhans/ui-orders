@@ -8,7 +8,7 @@ import { ADDRESSES } from '../components/Utils/resources';
 import { reasonsForClosureResource } from '../common/resources';
 import OrdersListFilters from './OrdersListFilters';
 
-const OrdersListFiltersContainer = ({ resources, activeFilters, applyFilters, disabled }) => {
+const OrdersListFiltersContainer = ({ resources, activeFilters, applyFilters, customFields, disabled }) => {
   const closingReasons = resources?.closingReasons?.records;
   const addresses = getAddresses(resources?.addresses?.records);
 
@@ -18,6 +18,7 @@ const OrdersListFiltersContainer = ({ resources, activeFilters, applyFilters, di
       activeFilters={activeFilters}
       applyFilters={applyFilters}
       closingReasons={closingReasons}
+      customFields={customFields}
       disabled={disabled}
     />
   );
@@ -31,6 +32,7 @@ OrdersListFiltersContainer.manifest = Object.freeze({
 OrdersListFiltersContainer.propTypes = {
   activeFilters: PropTypes.object.isRequired,
   applyFilters: PropTypes.func.isRequired,
+  customFields: PropTypes.arrayOf(PropTypes.object),
   disabled: PropTypes.bool.isRequired,
   resources: PropTypes.object.isRequired,
 };

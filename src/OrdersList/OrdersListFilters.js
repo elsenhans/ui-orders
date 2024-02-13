@@ -31,7 +31,7 @@ import {
 
 const applyFiltersAdapter = (applyFilters) => ({ name, values }) => applyFilters(name, values);
 
-function OrdersListFilters({ activeFilters, closingReasons, applyFilters, disabled, addresses }) {
+function OrdersListFilters({ activeFilters, closingReasons, customFields, applyFilters, disabled, addresses }) {
   const onChange = useCallback(
     applyFiltersAdapter(applyFilters),
     [applyFilters],
@@ -40,10 +40,13 @@ function OrdersListFilters({ activeFilters, closingReasons, applyFilters, disabl
   return (
     <AccordionSet>
       <CustomFieldsFilters
-        activeFilters={activeFilters}
-        id={'customFields.poMultiSelect'}
-        name={'customFields.poMultiSelect'}
+        activeFilters={activeFilters[FILTERS.CUSTOM_FIELDS]}
+        customFields={customFields}
+        id={FILTERS.CUSTOM_FIELDS}
+        name={FILTERS.CUSTOM_FIELDS}
         onChange={onChange}
+        closedByDefault={false}
+        disabled={disabled}
       />
       <AcqCheckboxFilter
         id={FILTERS.STATUS}
@@ -218,6 +221,7 @@ OrdersListFilters.propTypes = {
   activeFilters: PropTypes.object.isRequired,
   applyFilters: PropTypes.func.isRequired,
   closingReasons: closingReasonsShape,
+  customFields: PropTypes.arrayOf(PropTypes.object),
   disabled: PropTypes.bool.isRequired,
   addresses: PropTypes.arrayOf(PropTypes.object),
 };

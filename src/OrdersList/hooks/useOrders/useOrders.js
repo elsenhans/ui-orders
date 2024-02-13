@@ -14,7 +14,6 @@ import {
   ORDERS_API,
 } from '@folio/stripes-acq-components';
 
-import { getCustomFields } from '../../../common/utils';
 import { useBuildQuery } from '../useBuildQuery';
 
 export const useOrders = ({ pagination, fetchReferences }) => {
@@ -23,8 +22,7 @@ export const useOrders = ({ pagination, fetchReferences }) => {
   const { timezone } = useStripes();
 
   const { search } = useLocation();
-  const customFieldsFilterNames = getCustomFields();
-  const buildQuery = useBuildQuery(customFieldsFilterNames);
+  const buildQuery = useBuildQuery();
   const queryParams = queryString.parse(search);
 
   moment.tz.setDefault(timezone);

@@ -6,6 +6,7 @@ const indexes = [
   'metadata.createdDate',
   'dateOrdered',
   'poNumber',
+  // 'customFields',
 ];
 
 const searchByDate = (query, dateFormat) => {

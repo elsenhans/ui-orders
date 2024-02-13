@@ -1,31 +1,32 @@
 import PropTypes from 'prop-types';
 
-import { useCustomFields } from '@folio/stripes/smart-components';
-
-import CustomFieldsFilter from './CustomFieldsFilter';
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../constants';
 import { FILTERS } from '../../OrdersList/constants';
+import CustomFieldsFilter from './CustomFieldsFilter';
 
-const CustomFieldsFilters = ({ activeFilters, onChange }) => {
-  const [customFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
+const CustomFieldsFilters = ({
+  activeFilters,
+  customFields,
+  onChange,
+  ...props
+}) => {
 
-  if (!customFields) return null;
-
-  return customFields.map(customField => (
+  return customFields.map((customField) => (
     <CustomFieldsFilter
-      // activeFilters={activeFilters['customFields.poMultiSelect']}
-      // activeFilters={activeFilters[`customFields.${customField.refId}`]}
-      activeFilters={activeFilters[`${FILTERS.CUSTOM_FIELDS}.${customField.refId}`]}
+      activeFilters={
+        activeFilters[`${FILTERS.CUSTOM_FIELDS}.${customField.refId}`]
+      }
       customField={customField}
       key={`custom-field-${customField.id}`}
       onChange={onChange}
+      {...props}
     />
-    ));
+  ));
 };
 
 CustomFieldsFilters.propTypes = {
-  onChange: PropTypes.func.isRequired,
   activeFilters: PropTypes.object,
+  customFields: PropTypes.arrayOf(PropTypes.object),
+  onChange: PropTypes.func.isRequired,
 };
 
 export default CustomFieldsFilters;
