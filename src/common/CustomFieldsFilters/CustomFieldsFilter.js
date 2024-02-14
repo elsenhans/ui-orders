@@ -19,7 +19,7 @@ const customFieldTypeToFilterMap = {
 
 const CustomFieldsFilter = ({
   activeFilters,
-  closeByDefault,
+  closedByDefault,
   customField,
   disabled,
   onChange,
@@ -38,12 +38,11 @@ const CustomFieldsFilter = ({
     label,
     value,
   }));
-  const closedByDefault = false;
 
   return (
     <FilterAccordion
       activeFilters={activeFilters}
-      closeByDefault={closeByDefault}
+      closedByDefault={closedByDefault}
       disabled={disabled}
       id={`orders-filter-accordion-custom-field-${refId}`}
       label={name}
@@ -64,14 +63,14 @@ const CustomFieldsFilter = ({
 
 CustomFieldsFilter.propTypes = {
   customField: PropTypes.object,
-  closeByDefault: PropTypes.bool,
+  closedByDefault: PropTypes.bool,
   disabled: PropTypes.bool,
   onChange: PropTypes.func.isRequired,
   activeFilters: PropTypes.arrayOf(PropTypes.string),
 };
 
 CustomFieldsFilter.defaultProps = {
-  closeByDefault: true,
+  closedByDefault: true,
   disabled: true,
 };
 
