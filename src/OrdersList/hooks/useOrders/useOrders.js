@@ -16,13 +16,13 @@ import {
 
 import { useBuildQuery } from '../useBuildQuery';
 
-export const useOrders = ({ pagination, fetchReferences }) => {
+export const useOrders = ({ pagination, fetchReferences, customFields }) => {
   const ky = useOkapiKy();
   const [namespace] = useNamespace({ key: 'orders-list' });
   const { timezone } = useStripes();
 
   const { search } = useLocation();
-  const buildQuery = useBuildQuery();
+  const buildQuery = useBuildQuery(customFields);
   const queryParams = queryString.parse(search);
 
   moment.tz.setDefault(timezone);

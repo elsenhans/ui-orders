@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import {
   makeQueryBuilder,
@@ -12,8 +12,24 @@ import {
 import { makeSearchQuery } from '../../OrdersListSearchConfig';
 import { FILTERS } from '../../constants';
 
-export function useBuildQuery() {
+export function useBuildQuery(customFields) {
   const localeDateFormat = useLocaleDateFormat();
+
+  const customFieldsFilterMap = useMemo(() => {
+    const result = {};
+
+    if (customFields) {
+      customFields.forEach((cf) => {
+        const fieldName = `customFields.${cf.refId}`;
+
+        if (cf.type === 'MULTI_SELECT_DROPDOWN') {
+          result[fieldName] = buildArrayFieldQuery.bind(null, fieldName);
+        }
+      });
+    }
+
+    return result;
+  }, [customFields]);
 
   return useCallback(makeQueryBuilder(
     'cql.allRecords=1',
@@ -28,6 +44,8 @@ export function useBuildQuery() {
       },
       [FILTERS.TAGS]: buildArrayFieldQuery.bind(null, [FILTERS.TAGS]),
       [FILTERS.ACQUISITIONS_UNIT]: buildArrayFieldQuery.bind(null, [FILTERS.ACQUISITIONS_UNIT]),
+      ...customFieldsFilterMap,
     },
-  ), [localeDateFormat]);
+  ),
+  [customFieldsFilterMap, localeDateFormat]);
 }

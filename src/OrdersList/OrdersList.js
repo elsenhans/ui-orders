@@ -21,7 +21,6 @@ import {
   ColumnManagerMenu,
   PersistedPaneset,
   useColumnManager,
-  useCustomFields,
 } from '@folio/stripes/smart-components';
 import {
   FiltersPane,
@@ -41,10 +40,7 @@ import {
   useItemToView,
 } from '@folio/stripes-acq-components';
 
-import {
-  CANCEL_ORDER_REASON,
-  CUSTOM_FIELDS_BACKEND_MODULE_NAME,
-} from '../common/constants';
+import { CANCEL_ORDER_REASON } from '../common/constants';
 import { useIsRowSelected } from '../common/hooks';
 import OrdersNavigation from '../common/OrdersNavigation';
 import Panes from '../components/Panes';
@@ -112,6 +108,7 @@ function OrdersList({
   refreshList,
   ordersQuery,
   pagination,
+  customFields,
 }) {
   const stripes = useStripes();
   const [
@@ -133,7 +130,6 @@ function OrdersList({
   const [isExportModalOpened, toggleExportModal] = useModalToggle();
   const searchableIndexes = useSearchableIndexes();
   const { visibleColumns, toggleColumn } = useColumnManager('orders-column-manager', columnMapping);
-  const [customFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
 
   const { itemToView, setItemToView, deleteItemToView } = useItemToView('orders-list');
 
@@ -303,6 +299,7 @@ OrdersList.propTypes = {
   refreshList: PropTypes.func.isRequired,
   ordersQuery: PropTypes.string,
   pagination: PropTypes.object,
+  customFields: PropTypes.arrayOf(PropTypes.object),
 };
 
 OrdersList.defaultProps = {
@@ -310,6 +307,7 @@ OrdersList.defaultProps = {
   isLoading: false,
   orders: [],
   ordersQuery: '',
+  customFields: [],
 };
 
 export default withRouter(OrdersList);

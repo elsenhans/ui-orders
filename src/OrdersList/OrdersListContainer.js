@@ -7,6 +7,7 @@ import {
   usePagination,
   RESULT_COUNT_INCREMENT,
 } from '@folio/stripes-acq-components';
+import { useCustomFields } from '@folio/stripes/smart-components';
 
 import {
   ACQUISITIONS_UNITS,
@@ -20,6 +21,7 @@ import {
   fetchOrderVendors,
 } from './utils';
 
+import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../common/constants';
 import {
   useOrders,
 } from './hooks';
@@ -27,6 +29,7 @@ import {
 const resetData = () => { };
 
 const OrdersListContainer = ({ mutator }) => {
+  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
   const fetchReferences = useCallback(purchaseOrders => {
     const fetchVendorsPromise = fetchOrderVendors(mutator.orderVendors, purchaseOrders, {});
     const fetchAcqUnitsPromise = fetchOrderAcqUnits(mutator.orderAcqUnits, purchaseOrders, {});
@@ -58,18 +61,19 @@ const OrdersListContainer = ({ mutator }) => {
   }, []);
 
   const { pagination, changePage, refreshPage } = usePagination({ limit: RESULT_COUNT_INCREMENT, offset: 0 });
-  const { query, orders, isLoading, ordersCount } = useOrders({ pagination, fetchReferences });
+  const { query, orders, isLoading, ordersCount } = useOrders({ pagination, fetchReferences, customFields });
 
   return (
     <OrdersList
       ordersCount={ordersCount}
-      isLoading={isLoading}
+      isLoading={isLoading || isLoadingCustomFields}
       onNeedMoreData={changePage}
       orders={orders}
       pagination={pagination}
       refreshList={refreshPage}
       resetData={resetData}
       ordersQuery={query}
+      customFields={customFields}
     />
   );
 };
