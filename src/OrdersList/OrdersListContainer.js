@@ -29,7 +29,6 @@ import {
 const resetData = () => { };
 
 const OrdersListContainer = ({ mutator }) => {
-  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
   const fetchReferences = useCallback(purchaseOrders => {
     const fetchVendorsPromise = fetchOrderVendors(mutator.orderVendors, purchaseOrders, {});
     const fetchAcqUnitsPromise = fetchOrderAcqUnits(mutator.orderAcqUnits, purchaseOrders, {});
@@ -61,6 +60,7 @@ const OrdersListContainer = ({ mutator }) => {
   }, []);
 
   const { pagination, changePage, refreshPage } = usePagination({ limit: RESULT_COUNT_INCREMENT, offset: 0 });
+  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
   const { query, orders, isLoading, ordersCount } = useOrders({ pagination, fetchReferences, customFields });
 
   return (
