@@ -20,7 +20,7 @@ export function useBuildQuery(customFields) {
 
     if (customFields) {
       customFields.forEach((cf) => {
-        const fieldName = `customFields.${cf.refId}`;
+        const fieldName = `${FILTERS.CUSTOM_FIELDS}.${cf.refId}`;
 
         if (cf.type === 'MULTI_SELECT_DROPDOWN') {
           result[fieldName] = buildArrayFieldQuery.bind(null, fieldName);
