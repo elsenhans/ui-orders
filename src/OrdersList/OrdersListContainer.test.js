@@ -31,6 +31,10 @@ const renderOrdersListContainer = (props = {}) => render(
   { wrapper: MemoryRouter },
 );
 
+jest.mock('@folio/stripes/smart-components', () => ({
+  ...jest.requireActual('@folio/stripes/smart-components'),
+  useCustomFields: jest.fn(() => []),
+}), { virtual: true });
 jest.mock('./OrdersList', () => jest.fn().mockReturnValue('OrdersList'));
 jest.mock('./hooks', () => ({
   ...jest.requireActual('./hooks'),

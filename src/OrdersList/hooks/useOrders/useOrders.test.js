@@ -106,4 +106,15 @@ describe('useOrders', () => {
       query: queryMock,
     });
   });
+
+  it('should call useBuildQuery with customFields parameter', async () => {
+    const customFields = [{ id: '123' }];
+
+    renderHook(() => useOrders({
+      pagination: { limit: 5, offset: 0, timestamp: 42 },
+      customFields,
+    }), { wrapper });
+
+    await waitFor(() => expect(useBuildQuery).toHaveBeenCalledWith(customFields));
+  });
 });
