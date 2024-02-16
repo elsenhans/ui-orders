@@ -2,8 +2,29 @@ import { useMemo } from 'react';
 
 import { useLocaleDateFormat } from '@folio/stripes-acq-components';
 
-export function useSearchableIndexes() {
+import { FILTERS } from '../../constants';
+
+export function useSearchableIndexes(customFields) {
   const localeDateFormat = useLocaleDateFormat();
+
+  const customFieldsIndexes = useMemo(() => {
+    const result = [];
+
+    if (customFields) {
+      customFields.forEach(cf => {
+        const fieldName = `${FILTERS.CUSTOM_FIELDS}.${cf.refId}`;
+
+        if (cf.type === 'DATE_PICKER') {
+          result.push({ label: cf.name, value: fieldName, placeholder: localeDateFormat });
+        }
+        if (cf.type === 'TEXTBOX_SHORT' || cf.type === 'TEXTBOX_LONG') {
+          result.push({ label: cf.name, value: fieldName });
+        }
+      });
+    }
+
+    return result;
+  }, [customFields, localeDateFormat]);
 
   return useMemo(() => [
     {
@@ -24,9 +45,6 @@ export function useSearchableIndexes() {
       labelId: 'ui-orders.search.poNumber',
       value: 'poNumber',
     },
-    // {
-    //   labelId: 'ui-orders.search.customFields',
-    //   value: 'customFields',
-    // },
-  ], [localeDateFormat]);
+    ...customFieldsIndexes,
+  ], [customFieldsIndexes, localeDateFormat]);
 }

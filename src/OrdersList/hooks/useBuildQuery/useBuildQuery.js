@@ -33,7 +33,7 @@ export function useBuildQuery(customFields) {
 
   return useCallback(makeQueryBuilder(
     'cql.allRecords=1',
-    makeSearchQuery(localeDateFormat),
+    makeSearchQuery(localeDateFormat, customFields),
     'sortby metadata.updatedDate/sort.descending',
     {
       [FILTERS.DATE_CREATED]: buildDateTimeRangeQuery.bind(null, [FILTERS.DATE_CREATED]),

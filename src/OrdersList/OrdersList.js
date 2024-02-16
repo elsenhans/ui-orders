@@ -128,7 +128,7 @@ function OrdersList({
   ] = useLocationSorting(location, history, resetData, sortableColumns);
   const { isFiltersOpened, toggleFilters } = useFiltersToogle('ui-orders/orders/filters');
   const [isExportModalOpened, toggleExportModal] = useModalToggle();
-  const searchableIndexes = useSearchableIndexes();
+  const searchableIndexes = useSearchableIndexes(customFields);
   const { visibleColumns, toggleColumn } = useColumnManager('orders-column-manager', columnMapping);
 
   const { itemToView, setItemToView, deleteItemToView } = useItemToView('orders-list');
