@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
 import { stripesConnect } from '@folio/stripes/core';
+import { useCustomFields } from '@folio/stripes/smart-components';
 import {
   acqUnitsManifest,
   usePagination,
@@ -11,6 +12,7 @@ import {
 import {
   ORDERS,
 } from '../components/Utils/resources';
+import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../common/constants';
 
 import {
   useOrderLines,
@@ -46,12 +48,13 @@ const OrderLinesListContainer = ({ mutator }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'po_line');
   const { pagination, changePage, refreshPage } = usePagination({ limit: RESULT_COUNT_INCREMENT, offset: 0 });
   const { orderLines, orderLinesCount, isLoading, query } = useOrderLines({ pagination, fetchReferences });
 
   return (
     <OrderLinesList
-      isLoading={isLoading}
+      isLoading={isLoading || isLoadingCustomFields}
       orderLines={orderLines}
       orderLinesCount={orderLinesCount}
       pagination={pagination}
@@ -59,6 +62,7 @@ const OrderLinesListContainer = ({ mutator }) => {
       refreshList={refreshPage}
       resetData={resetData}
       linesQuery={query}
+      customFields={customFields}
     />
   );
 };

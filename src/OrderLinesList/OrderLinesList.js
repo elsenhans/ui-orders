@@ -106,6 +106,7 @@ export const columnMapping = {
 };
 
 function OrderLinesList({
+  customFields,
   history,
   isLoading,
   location,
@@ -211,6 +212,7 @@ function OrderLinesList({
           <OrderLinesFiltersContainer
             activeFilters={filters}
             applyFilters={applyFilters}
+            customFields={customFields}
             disabled={isLoading}
           />
         </FiltersPane>
@@ -289,6 +291,7 @@ function OrderLinesList({
 }
 
 OrderLinesList.propTypes = {
+  customFields: PropTypes.arrayOf(PropTypes.object),
   onNeedMoreData: PropTypes.func.isRequired,
   resetData: PropTypes.func.isRequired,
   orderLinesCount: PropTypes.number,
@@ -303,6 +306,7 @@ OrderLinesList.propTypes = {
 };
 
 OrderLinesList.defaultProps = {
+  customFields: [],
   orderLinesCount: 0,
   isLoading: false,
   orderLines: [],

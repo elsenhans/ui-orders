@@ -4,12 +4,16 @@ import PropTypes from 'prop-types';
 import {
   AccordionSet,
 } from '@folio/stripes/components';
+// import {
+//   CustomFieldsFilters
+// } from '@folio/stripes/smart-components';
 import {
   AcqCheckboxFilter,
   AcqDateRangeFilter,
   AcqTagsFilter,
   AcqUnitFilter,
   BooleanFilter,
+  CustomFieldsFilters,
   PluggableOrganizationFilter,
   PluggableUserFilter,
 } from '@folio/stripes-acq-components';
@@ -20,7 +24,7 @@ import SuffixFilter from '@folio/plugin-find-po-line/FindPOLine/SuffixFilter';
 import {
   AddressFilter,
   ClosingReasonFilter,
-  CustomFieldsFilters,
+  // CustomFieldsFilters,
 } from '../common';
 import {
   closingReasonsShape,
