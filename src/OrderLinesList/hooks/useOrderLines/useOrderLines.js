@@ -1,19 +1,21 @@
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router';
 import queryString from 'query-string';
-import moment from 'moment';
 
 import {
   useNamespace,
   useOkapiKy,
   useStripes,
 } from '@folio/stripes/core';
+import { useCustomFields } from '@folio/stripes/smart-components';
 import {
   getFiltersCount,
   LINES_API,
 } from '@folio/stripes-acq-components';
 
 import { getLinesQuery } from '@folio/plugin-find-po-line';
+
+import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../../../common/constants';
 
 export const useOrderLines = ({ pagination, fetchReferences }) => {
   const ky = useOkapiKy();
@@ -22,7 +24,10 @@ export const useOrderLines = ({ pagination, fetchReferences }) => {
 
   const { search } = useLocation();
   const queryParams = queryString.parse(search);
-  const buildQuery = getLinesQuery(queryParams, ky);
+  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'po_line');
+  if(!isLoadingCustomFields) {
+    const buildQuery = getLinesQuery(queryParams, null, customFields);
+  }
   const filtersCount = getFiltersCount(queryParams);
 
   const { isFetching, data = {} } = useQuery(
