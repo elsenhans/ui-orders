@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router';
 import queryString from 'query-string';
+import moment from 'moment-timezone';
 
 import {
   useNamespace,
@@ -25,9 +26,7 @@ export const useOrderLines = ({ pagination, fetchReferences }) => {
   const { search } = useLocation();
   const queryParams = queryString.parse(search);
   const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'po_line');
-  if(!isLoadingCustomFields) {
-    const buildQuery = getLinesQuery(queryParams, null, customFields);
-  }
+  const buildQuery = getLinesQuery(queryParams, null, customFields, isLoadingCustomFields);
   const filtersCount = getFiltersCount(queryParams);
 
   const { isFetching, data = {} } = useQuery(
