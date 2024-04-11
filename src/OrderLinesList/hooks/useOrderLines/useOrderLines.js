@@ -8,7 +8,6 @@ import {
   useOkapiKy,
   useStripes,
 } from '@folio/stripes/core';
-import { useCustomFields } from '@folio/stripes/smart-components';
 import {
   getFiltersCount,
   LINES_API,
@@ -16,16 +15,13 @@ import {
 
 import { getLinesQuery } from '@folio/plugin-find-po-line';
 
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../../../common/constants';
-
-export const useOrderLines = ({ pagination, fetchReferences }) => {
+export const useOrderLines = ({ pagination, fetchReferences, customFields, isLoadingCustomFields }) => {
   const ky = useOkapiKy();
   const [namespace] = useNamespace({ key: 'order-lines-list' });
   const { timezone } = useStripes();
 
   const { search } = useLocation();
   const queryParams = queryString.parse(search);
-  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'po_line');
   const buildQuery = getLinesQuery(queryParams, null, customFields, isLoadingCustomFields);
   const filtersCount = getFiltersCount(queryParams);
 

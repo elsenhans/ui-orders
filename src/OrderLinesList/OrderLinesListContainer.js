@@ -50,7 +50,7 @@ const OrderLinesListContainer = ({ mutator }) => {
 
   const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'po_line');
   const { pagination, changePage, refreshPage } = usePagination({ limit: RESULT_COUNT_INCREMENT, offset: 0 });
-  const { orderLines, orderLinesCount, isLoading, query } = useOrderLines({ pagination, fetchReferences });
+  const { orderLines, orderLinesCount, isLoading, query } = useOrderLines({ pagination, fetchReferences, customFields, isLoadingCustomFields });
 
   return (
     <OrderLinesList
