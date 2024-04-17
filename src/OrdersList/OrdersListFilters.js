@@ -10,6 +10,7 @@ import {
   AcqTagsFilter,
   AcqUnitFilter,
   BooleanFilter,
+  CustomFieldsFilters,
   PluggableOrganizationFilter,
   PluggableUserFilter,
 } from '@folio/stripes-acq-components';
@@ -20,7 +21,6 @@ import SuffixFilter from '@folio/plugin-find-po-line/FindPOLine/SuffixFilter';
 import {
   AddressFilter,
   ClosingReasonFilter,
-  CustomFieldsFilters,
 } from '../common';
 import {
   closingReasonsShape,
