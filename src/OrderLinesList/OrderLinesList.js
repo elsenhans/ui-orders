@@ -1,7 +1,6 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import {
   FormattedMessage,
-  useIntl,
 } from 'react-intl';
 import PropTypes from 'prop-types';
 import { get, omit } from 'lodash';
@@ -36,7 +35,6 @@ import {
   SingleSearchForm,
   useFiltersReset,
   useFiltersToogle,
-  useLocaleDateFormat,
   useLocalStorageFilters,
   useLocationSorting,
   useModalToggle,
@@ -44,10 +42,6 @@ import {
 } from '@folio/stripes-acq-components';
 import { searchableIndexes } from '@folio/plugin-find-po-line';
 
-import {
-  CUSTOM_FIELD_TYPES,
-  FILTERS,
-} from '../OrdersList/constants';
 import OrdersNavigation from '../common/OrdersNavigation';
 import {
   useIsRowSelected,
@@ -59,6 +53,7 @@ import OrderLinesFiltersContainer from './OrderLinesFiltersContainer';
 import Details from './Details';
 import OrderLinesListActionMenu from './OrderLinesListActionMenu';
 import LineExportSettingsModalContainer from './LineExportSettingModalContainer';
+import { useCustomFieldsSearchableIndexes } from '../CustomFieldsUtility';
 
 const VENDOR_REF_NUMBER = 'vendorDetail.refNumber';
 const UPDATED_DATE = 'metadata.updatedDate';
@@ -145,8 +140,7 @@ function OrderLinesList({
   const { visibleColumns, toggleColumn } = useColumnManager('order-lines-column-manager', columnMapping);
   const { itemToView, setItemToView, deleteItemToView } = useItemToView('order-lines-list');
 
-  const localeDateFormat = useLocaleDateFormat();
-  const intl = useIntl();
+  const customFieldsSearchableIndexes = useCustomFieldsSearchableIndexes(customFields);
   const pageTitle = useResultsPageTitle(filters);
 
   useFiltersReset(resetFilters);
@@ -159,35 +153,6 @@ function OrderLinesList({
       toggleFilters={toggleFilters}
     />
   );
-
-  const customFieldsSearchableIndexes = useMemo(() => {
-    let result = [];
-
-    if (customFields) {
-      result = customFields.map(cf => {
-        const customFieldLabel = intl.formatMessage({ id: 'stripes-smart-components.customFields' });
-        const fieldLabel = `${customFieldLabel} ${cf.name}`;
-        const fieldValue = `${FILTERS.CUSTOM_FIELDS}.${cf.refId}`;
-
-        if (cf.type === CUSTOM_FIELD_TYPES.TEXTBOX_LONG || cf.type === CUSTOM_FIELD_TYPES.TEXTBOX_SHORT) {
-          return {
-            label: fieldLabel,
-            value: fieldValue,
-          };
-        } else if (cf.type === CUSTOM_FIELD_TYPES.DATE_PICKER) {
-          return {
-            label: fieldLabel,
-            value: fieldValue,
-            placeholder: localeDateFormat,
-          };
-        } else {
-          return null;
-        }
-      }).filter(obj => obj !== null);
-    }
-
-    return result;
-  }, [customFields, localeDateFormat, intl]);
 
   const isRowSelected = useIsRowSelected(`${match.path}/view/:id`);
 

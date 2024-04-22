@@ -1,43 +1,23 @@
-import {
-  useCallback,
-  useMemo,
-} from 'react';
+import { useCallback } from 'react';
 
 import {
-  makeQueryBuilder,
-  useLocaleDateFormat,
+  ORDER_STATUSES,
   buildArrayFieldQuery,
   buildDateRangeQuery,
   buildDateTimeRangeQuery,
-  ORDER_STATUSES,
+  getCustomFieldsFilterMap,
+  makeQueryBuilder,
+  useLocaleDateFormat,
 } from '@folio/stripes-acq-components';
 
 import { makeSearchQuery } from '../../OrdersListSearchConfig';
 import {
-  CUSTOM_FIELD_TYPES,
   FILTERS,
 } from '../../constants';
 
 export function useBuildQuery(customFields) {
   const localeDateFormat = useLocaleDateFormat();
-
-  const customFieldsFilterMap = useMemo(() => {
-    const result = {};
-
-    if (customFields) {
-      customFields.forEach((cf) => {
-        const fieldName = `${FILTERS.CUSTOM_FIELDS}.${cf.refId}`;
-
-        if (cf.type === CUSTOM_FIELD_TYPES.MULTI_SELECT_DROPDOWN) {
-          result[fieldName] = buildArrayFieldQuery.bind(null, fieldName);
-        } else if (cf.type === CUSTOM_FIELD_TYPES.DATE_PICKER) {
-          result[fieldName] = buildDateTimeRangeQuery.bind(null, fieldName);
-        }
-      });
-    }
-
-    return result;
-  }, [customFields]);
+  const customFieldsFilterMap = getCustomFieldsFilterMap(customFields);
 
   return useCallback(makeQueryBuilder(
     'cql.allRecords=1',

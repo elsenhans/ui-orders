@@ -1,45 +1,10 @@
 import { useMemo } from 'react';
-import { useIntl } from 'react-intl';
 
-import { useLocaleDateFormat } from '@folio/stripes-acq-components';
-
-import {
-  CUSTOM_FIELD_TYPES,
-  FILTERS,
-} from '../../constants';
+import { useCustomFieldsSearchableIndexes, useLocaleDateFormat } from '@folio/stripes-acq-components';
 
 export function useSearchableIndexes(customFields) {
   const localeDateFormat = useLocaleDateFormat();
-  const intl = useIntl();
-
-  const customFieldsSearchableIndexes = useMemo(() => {
-    let result = [];
-
-    if (customFields) {
-      result = customFields.map(cf => {
-        const customFieldLabel = intl.formatMessage({ id: 'stripes-smart-components.customFields' });
-        const fieldLabel = `${customFieldLabel} ${cf.name}`;
-        const fieldValue = `${FILTERS.CUSTOM_FIELDS}.${cf.refId}`;
-
-        if (cf.type === CUSTOM_FIELD_TYPES.TEXTBOX_LONG || cf.type === CUSTOM_FIELD_TYPES.TEXTBOX_SHORT) {
-          return {
-            label: fieldLabel,
-            value: fieldValue,
-          };
-        } else if (cf.type === CUSTOM_FIELD_TYPES.DATE_PICKER) {
-          return {
-            label: fieldLabel,
-            value: fieldValue,
-            placeholder: localeDateFormat,
-          };
-        } else {
-          return null;
-        }
-      }).filter(obj => obj !== null);
-    }
-
-    return result;
-  }, [customFields, localeDateFormat, intl]);
+  const customFieldsSearchableIndexes = useCustomFieldsSearchableIndexes(customFields);
 
   return useMemo(() => [
     {
