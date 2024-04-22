@@ -47,7 +47,7 @@ import { searchableIndexes } from '@folio/plugin-find-po-line';
 import {
   CUSTOM_FIELD_TYPES,
   FILTERS,
-} from '../../src/OrdersList/constants';
+} from '../OrdersList/constants';
 import OrdersNavigation from '../common/OrdersNavigation';
 import {
   useIsRowSelected,

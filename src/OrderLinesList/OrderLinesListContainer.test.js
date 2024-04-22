@@ -7,6 +7,10 @@ import { useOrderLines } from './hooks';
 import OrderLinesListContainer from './OrderLinesListContainer';
 import OrderLinesList from './OrderLinesList';
 
+jest.mock('@folio/stripes/smart-components', () => ({
+  ...jest.requireActual('@folio/stripes/smart-components'),
+  useCustomFields: jest.fn(() => []),
+}), { virtual: true });
 jest.mock('./hooks', () => ({
   useOrderLines: jest.fn().mockReturnValue({}),
 }));

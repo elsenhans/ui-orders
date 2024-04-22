@@ -18,7 +18,7 @@ const OrderLinesFiltersContainer = ({
   activeFilters,
   applyFilters,
   customFields,
-  disabled
+  disabled,
 }) => {
   const funds = get(resources, `${DICT_FUNDS}.records`);
   const materialTypes = get(resources, 'materialTypes.records', []);
