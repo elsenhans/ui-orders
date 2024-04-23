@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { stripesConnect } from '@folio/stripes/core';
 import {
+  CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   organizationsManifest,
   usePagination,
   RESULT_COUNT_INCREMENT,
@@ -21,7 +22,6 @@ import {
   fetchOrderVendors,
 } from './utils';
 
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../common/constants';
 import {
   useOrders,
 } from './hooks';
@@ -60,7 +60,7 @@ const OrdersListContainer = ({ mutator }) => {
   }, []);
 
   const { pagination, changePage, refreshPage } = usePagination({ limit: RESULT_COUNT_INCREMENT, offset: 0 });
-  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_BACKEND_MODULE_NAME, 'purchase_order');
+  const [customFields, isLoadingCustomFields] = useCustomFields(CUSTOM_FIELDS_ORDERS_BACKEND_NAME, 'purchase_order');
   const { query, orders, isLoading, ordersCount } = useOrders({ pagination, fetchReferences, customFields });
 
   return (

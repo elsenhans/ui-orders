@@ -12,6 +12,7 @@ import {
 } from '@folio/stripes/core';
 import {
   baseManifest,
+  CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   getErrorCodeFromResponse,
   LIMIT_MAX,
   handleKeyCommand,
@@ -60,7 +61,6 @@ import {
   ORDERS_ROUTE,
   REEXPORT_SOURCES,
   WORKFLOW_STATUS,
-  CUSTOM_FIELDS_BACKEND_MODULE_NAME,
 } from '../../common/constants';
 import {
   useExportHistory,
@@ -846,7 +846,7 @@ const PO = ({
             />
             <ViewCustomFieldsRecord
               accordionId="customFieldsPO"
-              backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+              backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
               customFieldsValues={customFieldsValues}
               entityType="purchase_order"
             />

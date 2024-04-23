@@ -1,13 +1,11 @@
-import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router-dom';
 
+import { CUSTOM_FIELDS_ORDERS_BACKEND_NAME } from '@folio/stripes-acq-components';
 import { useStripes } from '@folio/stripes/core';
 import {
-  ViewCustomFieldsSettings,
   EditCustomFieldsSettings,
+  ViewCustomFieldsSettings,
 } from '@folio/stripes/smart-components';
-
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../common/constants/constants';
 
 const CustomFieldsSettings = () => {
   const stripes = useStripes();
@@ -28,7 +26,7 @@ const CustomFieldsSettings = () => {
     <Switch>
       <Route exact path={basePO}>
         <ViewCustomFieldsSettings
-          backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
           entityType={entityTypePO}
           editRoute={`${basePO}/edit`}
           permissions={permissions}
@@ -36,7 +34,7 @@ const CustomFieldsSettings = () => {
       </Route>
       <Route exact path={`${basePO}/edit`}>
         <EditCustomFieldsSettings
-          backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
           entityType={entityTypePO}
           viewRoute={basePO}
           permissions={permissions}
@@ -44,7 +42,7 @@ const CustomFieldsSettings = () => {
       </Route>
       <Route exact path={basePOL}>
         <ViewCustomFieldsSettings
-          backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
           entityType={entityTypePOL}
           editRoute={`${basePOL}/edit`}
           permissions={permissions}
@@ -52,7 +50,7 @@ const CustomFieldsSettings = () => {
       </Route>
       <Route exact path={`${basePOL}/edit`}>
         <EditCustomFieldsSettings
-          backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
           entityType={entityTypePOL}
           viewRoute={basePOL}
           permissions={permissions}
