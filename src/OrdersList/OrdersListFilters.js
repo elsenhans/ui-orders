@@ -10,6 +10,7 @@ import {
   AcqTagsFilter,
   AcqUnitFilter,
   BooleanFilter,
+  CUSTOM_FIELDS_FILTER,
   CustomFieldsFilters,
   PluggableOrganizationFilter,
   PluggableUserFilter,
@@ -201,8 +202,8 @@ function OrdersListFilters({
         activeFilters={activeFilters}
         customFields={customFields}
         disabled={disabled}
-        id={FILTERS.CUSTOM_FIELDS}
-        name={FILTERS.CUSTOM_FIELDS}
+        id={CUSTOM_FIELDS_FILTER}
+        name={CUSTOM_FIELDS_FILTER}
         onChange={onChange}
       />
       <PluggableUserFilter

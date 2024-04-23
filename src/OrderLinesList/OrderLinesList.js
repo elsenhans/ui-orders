@@ -33,6 +33,7 @@ import {
   ResetButton,
   ResultsPane,
   SingleSearchForm,
+  useCustomFieldsSearchableIndexes,
   useFiltersReset,
   useFiltersToogle,
   useLocalStorageFilters,
@@ -53,7 +54,6 @@ import OrderLinesFiltersContainer from './OrderLinesFiltersContainer';
 import Details from './Details';
 import OrderLinesListActionMenu from './OrderLinesListActionMenu';
 import LineExportSettingsModalContainer from './LineExportSettingModalContainer';
-import { useCustomFieldsSearchableIndexes } from '../CustomFieldsUtility';
 
 const VENDOR_REF_NUMBER = 'vendorDetail.refNumber';
 const UPDATED_DATE = 'metadata.updatedDate';
