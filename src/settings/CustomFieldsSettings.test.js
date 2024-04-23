@@ -17,6 +17,7 @@ jest.mock('@folio/stripes/smart-components', () => {
   );
 
   return {
+    ...jest.requireActual('@folio/stripes/smart-components'),
     ViewCustomFieldsSettings: mockViewCustomFieldsSettings,
     EditCustomFieldsSettings: mockEditCustomFieldsSettings,
   };
