@@ -18,6 +18,7 @@ import { FormattedMessage } from 'react-intl';
 import { useHistory } from 'react-router';
 
 import {
+  CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   Donors,
   FundDistributionFieldsFinal,
   handleKeyCommand,
@@ -56,7 +57,6 @@ import {
   ViewMetaData,
 } from '@folio/stripes/smart-components';
 
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../../common/constants';
 import {
   useErrorAccordionStatus,
   useFundDistributionValidation,
@@ -682,7 +682,7 @@ function POLineForm({
 
                         <EditCustomFieldsRecord
                           accordionId="customFieldsPOLine"
-                          backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+                          backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                           changeFinalFormField={change}
                           entityType="po_line"
                           fieldComponent={Field}

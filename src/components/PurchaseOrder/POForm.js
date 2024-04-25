@@ -29,11 +29,11 @@ import {
 } from '@folio/stripes/components';
 import { EditCustomFieldsRecord } from '@folio/stripes/smart-components';
 import {
+  CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   FieldSelectionFinal as FieldSelection,
   handleKeyCommand,
 } from '@folio/stripes-acq-components';
 
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../../common/constants';
 import { useErrorAccordionStatus } from '../../common/hooks';
 import {
   getAddresses,
@@ -379,7 +379,7 @@ const POForm = ({
                             </Accordion>
                             <EditCustomFieldsRecord
                               accordionId="customFieldsPO"
-                              backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+                              backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                               changeFinalFormField={change}
                               entityType="purchase_order"
                               fieldComponent={Field}

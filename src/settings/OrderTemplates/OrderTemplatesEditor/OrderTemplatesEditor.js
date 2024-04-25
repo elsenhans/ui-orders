@@ -23,8 +23,9 @@ import {
 import stripesForm from '@folio/stripes/final-form';
 import { EditCustomFieldsRecord } from '@folio/stripes/smart-components';
 import {
-  FundDistributionFieldsFinal,
+  CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   FieldTags,
+  FundDistributionFieldsFinal,
   handleKeyCommand,
 } from '@folio/stripes-acq-components';
 
@@ -41,10 +42,7 @@ import {
   isPhresource,
   isOtherResource,
 } from '../../../common/POLFields';
-import {
-  WORKFLOW_STATUS,
-  CUSTOM_FIELDS_BACKEND_MODULE_NAME,
-} from '../../../common/constants';
+import { WORKFLOW_STATUS } from '../../../common/constants';
 import {
   useErrorAccordionStatus,
   useFundDistributionValidation,
@@ -413,7 +411,7 @@ const OrderTemplatesEditor = ({
 
                       <EditCustomFieldsRecord
                         accordionId={ORDER_TEMPLATES_ACCORDION.PO_CUSTOM_FIELDS}
-                        backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+                        backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                         changeFinalFormField={change}
                         entityType="purchase_order"
                         fieldComponent={Field}
@@ -421,7 +419,7 @@ const OrderTemplatesEditor = ({
                       />
                       <EditCustomFieldsRecord
                         accordionId={ORDER_TEMPLATES_ACCORDION.POL_CUSTOM_FIELDS}
-                        backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+                        backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                         changeFinalFormField={change}
                         entityType="po_line"
                         fieldComponent={Field}

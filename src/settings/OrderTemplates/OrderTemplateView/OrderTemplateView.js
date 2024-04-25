@@ -25,12 +25,12 @@ import {
 } from '@folio/stripes/components';
 import { ViewCustomFieldsRecord } from '@folio/stripes/smart-components';
 import {
+  CUSTOM_FIELDS_ORDERS_BACKEND_NAME,
   FundDistributionView,
   ORDER_FORMATS,
   handleKeyCommand,
 } from '@folio/stripes-acq-components';
 
-import { CUSTOM_FIELDS_BACKEND_MODULE_NAME } from '../../../common/constants';
 import { isOngoing } from '../../../common/POFields';
 import { PODetailsView } from '../../../components/PurchaseOrder/PODetails';
 import { SummaryView } from '../../../components/PurchaseOrder/Summary';
@@ -416,14 +416,14 @@ class OrderTemplateView extends Component {
 
                     <ViewCustomFieldsRecord
                       accordionId={ORDER_TEMPLATES_ACCORDION.PO_CUSTOM_FIELDS}
-                      backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+                      backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                       customFieldsValues={customFieldsValues}
                       entityType="purchase_order"
                     />
 
                     <ViewCustomFieldsRecord
                       accordionId={ORDER_TEMPLATES_ACCORDION.POL_CUSTOM_FIELDS}
-                      backendModuleName={CUSTOM_FIELDS_BACKEND_MODULE_NAME}
+                      backendModuleName={CUSTOM_FIELDS_ORDERS_BACKEND_NAME}
                       customFieldsValues={customFieldsValues}
                       entityType="po_line"
                     />

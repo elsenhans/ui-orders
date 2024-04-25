@@ -10,6 +10,8 @@ import {
   AcqTagsFilter,
   AcqUnitFilter,
   BooleanFilter,
+  CUSTOM_FIELDS_FILTER,
+  CustomFieldsFilters,
   PluggableOrganizationFilter,
   PluggableUserFilter,
 } from '@folio/stripes-acq-components';
@@ -20,7 +22,6 @@ import SuffixFilter from '@folio/plugin-find-po-line/FindPOLine/SuffixFilter';
 import {
   AddressFilter,
   ClosingReasonFilter,
-  CustomFieldsFilters,
 } from '../common';
 import {
   closingReasonsShape,
@@ -201,8 +202,8 @@ function OrdersListFilters({
         activeFilters={activeFilters}
         customFields={customFields}
         disabled={disabled}
-        id={FILTERS.CUSTOM_FIELDS}
-        name={FILTERS.CUSTOM_FIELDS}
+        id={CUSTOM_FIELDS_FILTER}
+        name={CUSTOM_FIELDS_FILTER}
         onChange={onChange}
       />
       <PluggableUserFilter

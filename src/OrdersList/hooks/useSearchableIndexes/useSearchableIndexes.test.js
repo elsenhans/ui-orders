@@ -1,6 +1,6 @@
 import { renderHook } from '@folio/jest-config-stripes/testing-library/react';
+import { CUSTOM_FIELDS_FIXTURE } from '@folio/stripes-acq-components';
 
-import { CUSTOM_FIELDS } from 'fixtures/customFields';
 import { useSearchableIndexes } from './useSearchableIndexes';
 
 const SEARCHABLE_INDEXES = [
@@ -50,7 +50,7 @@ describe('useSearchableIndexes', () => {
   });
 
   it('should return array of searchable indexes and searchable indexes of custom fields', () => {
-    const { result } = renderHook(() => useSearchableIndexes(CUSTOM_FIELDS));
+    const { result } = renderHook(() => useSearchableIndexes(CUSTOM_FIELDS_FIXTURE));
 
     expect(result.current).toEqual(SEARCHABLE_INDEXES_WITH_CUSTOM_FIELDS);
   });

@@ -62,8 +62,6 @@ export const OKAPI_TENANT_HEADER = 'X-Okapi-Tenant';
 
 export const HIDDEN_ORDER_FIELDS_FOR_VERSION_HISTORY = ['nextPolNumber'];
 
-export const CUSTOM_FIELDS_BACKEND_MODULE_NAME = 'Orders CRUD module';
-
 export const CENTRAL_ORDERING_DEFAULT_RECEIVING_SEARCH = {
   activeAffiliationOnly: 'Active affiliation only',
   centralOnly: 'Central only',
