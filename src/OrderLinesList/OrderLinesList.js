@@ -33,6 +33,7 @@ import {
   ResetButton,
   ResultsPane,
   SingleSearchForm,
+  useCustomFieldsSearchableIndexes,
   useFiltersReset,
   useFiltersToogle,
   useLocalStorageFilters,
@@ -106,6 +107,7 @@ export const columnMapping = {
 };
 
 function OrderLinesList({
+  customFields,
   history,
   isLoading,
   location,
@@ -138,6 +140,7 @@ function OrderLinesList({
   const { visibleColumns, toggleColumn } = useColumnManager('order-lines-column-manager', columnMapping);
   const { itemToView, setItemToView, deleteItemToView } = useItemToView('order-lines-list');
 
+  const customFieldsSearchableIndexes = useCustomFieldsSearchableIndexes(customFields);
   const pageTitle = useResultsPageTitle(filters);
 
   useFiltersReset(resetFilters);
@@ -198,7 +201,7 @@ function OrderLinesList({
             searchQuery={searchQuery}
             isLoading={isLoading}
             ariaLabelId="ui-orders.search"
-            searchableIndexes={searchableIndexes}
+            searchableIndexes={[...searchableIndexes, ...customFieldsSearchableIndexes]}
             changeSearchIndex={changeIndex}
             selectedIndex={searchIndex}
           />
@@ -211,6 +214,7 @@ function OrderLinesList({
           <OrderLinesFiltersContainer
             activeFilters={filters}
             applyFilters={applyFilters}
+            customFields={customFields}
             disabled={isLoading}
           />
         </FiltersPane>
@@ -289,6 +293,7 @@ function OrderLinesList({
 }
 
 OrderLinesList.propTypes = {
+  customFields: PropTypes.arrayOf(PropTypes.object),
   onNeedMoreData: PropTypes.func.isRequired,
   resetData: PropTypes.func.isRequired,
   orderLinesCount: PropTypes.number,
@@ -303,6 +308,7 @@ OrderLinesList.propTypes = {
 };
 
 OrderLinesList.defaultProps = {
+  customFields: [],
   orderLinesCount: 0,
   isLoading: false,
   orderLines: [],

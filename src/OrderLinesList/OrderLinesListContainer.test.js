@@ -1,14 +1,19 @@
 import { MemoryRouter } from 'react-router';
 
 import { render, screen, act } from '@folio/jest-config-stripes/testing-library/react';
+import { useCustomFields } from '@folio/stripes/smart-components';
+import { CUSTOM_FIELDS_FIXTURE } from '@folio/stripes-acq-components';
 
 import { order, orderLine } from 'fixtures';
 import { useOrderLines } from './hooks';
 import OrderLinesListContainer from './OrderLinesListContainer';
 import OrderLinesList from './OrderLinesList';
 
-jest.mock('./hooks', () => ({
-  useOrderLines: jest.fn().mockReturnValue({}),
+jest.mock('@folio/stripes/smart-components', () => ({
+  ...jest.requireActual('@folio/stripes/smart-components'),
+  useCustomFields: jest.fn().mockReturnValue([]),
+}));
+jest.mock('./hooks', () => ({ useOrderLines: jest.fn().mockReturnValue({}),
 }));
 jest.mock('./OrderLinesList', () => jest.fn().mockReturnValue('OrderLinesList'));
 
@@ -52,6 +57,14 @@ describe('OrderLinesListContainer', () => {
     renderOrderLinesListContainer();
 
     expect(OrderLinesList.mock.calls[0][0].orderLines).toBe(orderLines);
+  });
+
+  it('should pass useCustomFields result to OrderLinesList', () => {
+    OrderLinesList.mockClear();
+    useCustomFields.mockReturnValue([CUSTOM_FIELDS_FIXTURE]);
+    renderOrderLinesListContainer();
+
+    expect(OrderLinesList.mock.calls[0][0].customFields).toBe(CUSTOM_FIELDS_FIXTURE);
   });
 
   it('should load orders when fetchReferences is called', async () => {

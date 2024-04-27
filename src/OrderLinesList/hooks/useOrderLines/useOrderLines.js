@@ -11,18 +11,20 @@ import {
 import {
   getFiltersCount,
   LINES_API,
+  useLocaleDateFormat,
 } from '@folio/stripes-acq-components';
 
 import { getLinesQuery } from '@folio/plugin-find-po-line';
 
-export const useOrderLines = ({ pagination, fetchReferences }) => {
+export const useOrderLines = ({ pagination, fetchReferences, customFields }) => {
   const ky = useOkapiKy();
   const [namespace] = useNamespace({ key: 'order-lines-list' });
   const { timezone } = useStripes();
 
   const { search } = useLocation();
+  const localeDateFormat = useLocaleDateFormat();
   const queryParams = queryString.parse(search);
-  const buildQuery = getLinesQuery(queryParams, ky);
+  const buildQuery = getLinesQuery(queryParams, ky, localeDateFormat, customFields);
   const filtersCount = getFiltersCount(queryParams);
 
   const { isFetching, data = {} } = useQuery(
