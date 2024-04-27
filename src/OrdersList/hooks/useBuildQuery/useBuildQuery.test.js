@@ -1,7 +1,11 @@
 import queryString from 'query-string';
 
 import { renderHook } from '@folio/jest-config-stripes/testing-library/react';
-import { CUSTOM_FIELDS_FILTER, CUSTOM_FIELDS_FIXTURE, ORDER_STATUSES } from '@folio/stripes-acq-components';
+import {
+  CUSTOM_FIELDS_FILTER,
+  CUSTOM_FIELDS_FIXTURE,
+  ORDER_STATUSES,
+} from '@folio/stripes-acq-components';
 
 import { FILTERS } from '../../constants';
 import { useBuildQuery } from './useBuildQuery';

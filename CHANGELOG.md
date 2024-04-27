@@ -2,6 +2,7 @@
 
 ## 7.0.0 (IN PROGRESS)
 
+* Apply code refactoring for custom fields. Refs UIOR-1265.
 * UX Consistency: HTML page title display when third pane (detail record) displays. Refs UIOR-1202.
 * *BREAKING* Settings - implement Routing list configuration. Refs UIOR-1249.
 * *BREAKING* Implement central ordering settings for receiving search configuration. Refs UIOR-1232.

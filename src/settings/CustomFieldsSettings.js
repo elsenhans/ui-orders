@@ -1,11 +1,14 @@
-import { Route, Switch } from 'react-router-dom';
+import {
+  Route,
+  Switch,
+} from 'react-router-dom';
 
-import { CUSTOM_FIELDS_ORDERS_BACKEND_NAME } from '@folio/stripes-acq-components';
 import { useStripes } from '@folio/stripes/core';
 import {
   EditCustomFieldsSettings,
   ViewCustomFieldsSettings,
 } from '@folio/stripes/smart-components';
+import { CUSTOM_FIELDS_ORDERS_BACKEND_NAME } from '@folio/stripes-acq-components';
 
 const CustomFieldsSettings = () => {
   const stripes = useStripes();

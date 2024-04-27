@@ -1,6 +1,9 @@
 import { useMemo } from 'react';
 
-import { useCustomFieldsSearchableIndexes, useLocaleDateFormat } from '@folio/stripes-acq-components';
+import {
+  useCustomFieldsSearchableIndexes,
+  useLocaleDateFormat,
+} from '@folio/stripes-acq-components';
 
 export function useSearchableIndexes(customFields) {
   const localeDateFormat = useLocaleDateFormat();

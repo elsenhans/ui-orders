@@ -29,6 +29,7 @@ import {
   handleKeyCommand,
 } from '@folio/stripes-acq-components';
 
+import { WORKFLOW_STATUS } from '../../../common/constants';
 import {
   INITIAL_SECTIONS,
   MAP_FIELD_ACCORDION,
@@ -42,7 +43,6 @@ import {
   isPhresource,
   isOtherResource,
 } from '../../../common/POLFields';
-import { WORKFLOW_STATUS } from '../../../common/constants';
 import {
   useErrorAccordionStatus,
   useFundDistributionValidation,
